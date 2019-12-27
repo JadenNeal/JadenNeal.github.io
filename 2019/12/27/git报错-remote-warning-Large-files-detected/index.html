@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    pycharm导入anaconda虚拟环境问题 |  Jaden Neal&#39;s Blog
+    git报错-remote: warning: Large files detected |  Jaden Neal&#39;s Blog
   </title>
   
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -31,7 +31,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-pycharm导入anaconda虚拟环境问题" class="article article-type-post" itemscope
+  <article id="post-git报错-remote-warning-Large-files-detected" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -39,7 +39,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  pycharm导入anaconda虚拟环境问题
+  git报错-remote: warning: Large files detected
 </h1>
   
 
@@ -48,8 +48,8 @@
 
     
     <div class="article-meta">
-      <a href="/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" class="article-date">
-  <time datetime="2019-12-27T07:08:31.000Z" itemprop="datePublished">2019-12-27</time>
+      <a href="/2019/12/27/git%E6%8A%A5%E9%94%99-remote-warning-Large-files-detected/" class="article-date">
+  <time datetime="2019-12-27T08:31:25.000Z" itemprop="datePublished">2019-12-27</time>
 </a>
       
     </div>
@@ -70,44 +70,32 @@
       
 
       
-      <p>很久没用pycharm了，版本较旧。加上之前jupyter一直有些bug，于是重新装了anaconda，自带python版本为3.7</p>
+      <p>本篇是关于git上传大文件报错的问题。</p>
 <a id="more"></a>
 
-<p>最近毕设开题，因此创建了一个新环境，想着自己对python3.6比较熟悉，于是在创建的时候使用了以下命令<code>conda create -n rlearning python=3.6</code>，装下来之后就紧接着装<code>numpy</code>、<code>pandas</code>之类的常用的模块，最后打开pycharm，导入。</p>
-<p>随便运行了之前做过的项目，发现跳出了一大片红色，仔细一看，问题是numpy导入错误，<strong>找不到指定的模块</strong>。</p>
-<p>于是我去到控制台，激活刚刚创建的环境，输入<code>python</code>，接着<code>import numpy</code>，结果导入成功。</p>
-<p>这就非常令人疑惑了。在终端里能导入，在pycharm中却导入不了，为什么呢？</p>
-<p>于是我搜索相关问题，得到以下处理方法：</p>
+<blockquote>
+<p>码云的通告：<br>对于普通用户码云单个仓库限制为1G，单个文件限制100M。如果超过限制,您的代码将无法推送,我们提供的只是代码托管平台, 不是网盘,二进制文件请勿存放在码云,我们会不定期执行仓库大小扫描,如果发现你您的仓库超过大小超过1G,我们会联系您处理, 如果您15个工作日内没有处理,我们将暂停您的仓库的访问,请注意,我们只是暂停您仓库的访问,并不是删除您的仓库, 如果您超过半年没有处理,我们将永久屏蔽该仓库的访问.<br>如果用户仓库提交超过 1GB,请在本地减小仓库体积后清空远程仓库,重新推送到远程服务器即可.这一策略适用与大文件.<br>企业用户能够支持更大体积的仓库。</p>
+</blockquote>
+<p>所以，如果一次性上传的文件大小超过100M，则会抛出上述的错误。</p>
+<p>那么处理方式如下：</p>
 <ol>
-<li>重装numpy</li>
-<li>删除环境，重装</li>
-<li>还有诸如多版本问题，需要在环境变量中指定路径</li>
+<li>给这个文件开个后门。</li>
+<li>放弃上传此超标文件。</li>
+<li>修改上传文件大小的限制。</li>
 </ol>
-<p>都没有解决。</p>
-<p>随后，我再次打开pycharm，却发现自己正在使用的numpy版本是1.17.0（应该是这个，反正是1.17版本），但pycharm的第三列写的<strong>latest version</strong>却是1.16.4。</p>
-<p>这时候我才明白，原来是版本过新的原因。</p>
-<p>我把问题列写在下面：</p>
-<ul>
-<li>创建环境时只写了3.6，结果较新的anaconda默认装的是3.6的最高版本——python 3.6.9</li>
-<li>在安装模块的时候我也没有指定版本，于是anaconda装了python 3.6.9版本所能支持的numpy的最高版本。</li>
-<li>如此以来,pycharm就无法正常工作了。</li>
-</ul>
-<p>所以，针对这个问题就有两个解决办法。</p>
-<ol>
-<li>重装numpy，只不过要指定numpy的版本不能超过pycharm所能支持的最高版本；不想指定的话就得删除该环境，新建一个python版本较低的环境。</li>
-<li>更新pycharm，把pycharm更新到最新版，以前的环境自然就能用了。</li>
-</ol>
-<p>总之，最后的目的就是要将二者的版本匹配，使用的版本不能超过pycharm支持的版本。</p>
-<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lV0qxg.png" alt="lV0qxg.png" border="0" ></div>
-
-
+<p>这里只说第一种解决方法。</p>
+<p>在<code>bash</code>中输入<code>git filter-branch -f --index-filter &quot;git rm -rf --cached --ignore-unmatch example.zip&quot; -- --all</code>，其中的<code>example.zip</code>就是超标的文件名，当然了，也可以是文件夹，例如:<br><code>git filter-branch -f --index-filter &quot;git rm -rf --cached --ignore-unmatch assignment1/cs231n/datasets&quot; -- --all</code>，就上传了<code>datasets</code>文件夹。</p>
+<hr>
+<p>上述工作完成后，之前还有一个上传失败的文件夹，在库中显示为文件名，但打不开，于是就想删除它。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git rm -r xxx  <span class="comment"># xxx为文件名，带后缀</span></span><br><span class="line">git commit -m <span class="string">"添加自己想说明的信息"</span></span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+<p>这样就删除了不需要的文件。</p>
 
       
       <!-- 打赏 -->
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://jadenneal.github.io/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" data-id="ck4ntfinh0000e0pb7zz70myn"
+      <a data-url="https://jadenneal.github.io/2019/12/27/git%E6%8A%A5%E9%94%99-remote-warning-Large-files-detected/" data-id="ck4nwniiu0000jkpbaaxh8az8"
         class="article-share-link">分享</a>
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%85%B6%E4%BB%96/" rel="tag">其他</a></li></ul>
@@ -120,19 +108,10 @@
   
   <nav class="article-nav">
     
-      <a href="/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            使用BeautifulSoup爬虫（二）
-          
-        </div>
-      </a>
     
-    
-      <a href="/2019/12/27/Vs-Code-%E9%85%8D%E7%BD%AEC%E8%AF%AD%E8%A8%80%E9%97%AE%E9%A2%98/" class="article-nav-link">
+      <a href="/2019/12/27/%E6%8F%90%E6%95%88%E5%B7%A5%E5%85%B7git%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Vs Code 配置C语言问题</div>
+        <div class="article-nav-title">提效工具git的使用</div>
       </a>
     
   </nav>

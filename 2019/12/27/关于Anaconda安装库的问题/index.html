@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    pycharm导入anaconda虚拟环境问题 |  Jaden Neal&#39;s Blog
+    关于Anaconda安装库的问题 |  Jaden Neal&#39;s Blog
   </title>
   
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -31,7 +31,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-pycharm导入anaconda虚拟环境问题" class="article article-type-post" itemscope
+  <article id="post-关于Anaconda安装库的问题" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -39,7 +39,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  pycharm导入anaconda虚拟环境问题
+  关于Anaconda安装库的问题
 </h1>
   
 
@@ -48,8 +48,8 @@
 
     
     <div class="article-meta">
-      <a href="/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" class="article-date">
-  <time datetime="2019-12-27T07:08:31.000Z" itemprop="datePublished">2019-12-27</time>
+      <a href="/2019/12/27/%E5%85%B3%E4%BA%8EAnaconda%E5%AE%89%E8%A3%85%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2019-12-27T08:15:20.000Z" itemprop="datePublished">2019-12-27</time>
 </a>
       
     </div>
@@ -70,44 +70,35 @@
       
 
       
-      <p>很久没用pycharm了，版本较旧。加上之前jupyter一直有些bug，于是重新装了anaconda，自带python版本为3.7</p>
+      <p>今天使用anaconda中的matplotlib时弹出了找不到“._path.py”的错误。</p>
+<p>于是进入prompt卸载重装matplotlib库，结果是卸载成功，重新安装却失败了。</p>
+<p>弹出了<strong>“拒绝访问”</strong>的错误。</p>
 <a id="more"></a>
 
-<p>最近毕设开题，因此创建了一个新环境，想着自己对python3.6比较熟悉，于是在创建的时候使用了以下命令<code>conda create -n rlearning python=3.6</code>，装下来之后就紧接着装<code>numpy</code>、<code>pandas</code>之类的常用的模块，最后打开pycharm，导入。</p>
-<p>随便运行了之前做过的项目，发现跳出了一大片红色，仔细一看，问题是numpy导入错误，<strong>找不到指定的模块</strong>。</p>
-<p>于是我去到控制台，激活刚刚创建的环境，输入<code>python</code>，接着<code>import numpy</code>，结果导入成功。</p>
-<p>这就非常令人疑惑了。在终端里能导入，在pycharm中却导入不了，为什么呢？</p>
-<p>于是我搜索相关问题，得到以下处理方法：</p>
-<ol>
-<li>重装numpy</li>
-<li>删除环境，重装</li>
-<li>还有诸如多版本问题，需要在环境变量中指定路径</li>
-</ol>
-<p>都没有解决。</p>
-<p>随后，我再次打开pycharm，却发现自己正在使用的numpy版本是1.17.0（应该是这个，反正是1.17版本），但pycharm的第三列写的<strong>latest version</strong>却是1.16.4。</p>
-<p>这时候我才明白，原来是版本过新的原因。</p>
-<p>我把问题列写在下面：</p>
-<ul>
-<li>创建环境时只写了3.6，结果较新的anaconda默认装的是3.6的最高版本——python 3.6.9</li>
-<li>在安装模块的时候我也没有指定版本，于是anaconda装了python 3.6.9版本所能支持的numpy的最高版本。</li>
-<li>如此以来,pycharm就无法正常工作了。</li>
-</ul>
-<p>所以，针对这个问题就有两个解决办法。</p>
-<ol>
-<li>重装numpy，只不过要指定numpy的版本不能超过pycharm所能支持的最高版本；不想指定的话就得删除该环境，新建一个python版本较低的环境。</li>
-<li>更新pycharm，把pycharm更新到最新版，以前的环境自然就能用了。</li>
-</ol>
-<p>总之，最后的目的就是要将二者的版本匹配，使用的版本不能超过pycharm支持的版本。</p>
-<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lV0qxg.png" alt="lV0qxg.png" border="0" ></div>
+<p><strong>第一种：</strong>“ERROR 13 “拒绝访问” ”：</p>
+<p>这种情况只要右键管理员模式 运行promt即可。</p>
+<p><strong>第二种：</strong></p>
+<p>这也是我今晚遇到的这种，按理说管理员模式运行的情况下已经获得了系统的最高权限，对于Anaconda文件夹的控制权限属于最高级，但是在重新安装的过程中还是出现了“Pemission denied”的错误，度娘很久也求而不得。于是尝试了以下方法：</p>
+<p>再次检查conda命令，在prompt命令行下输入“conda install matplotlib”。——————失败</p>
+<p>使用“pip3 install matplotlib”————————————————————失败</p>
+<p>进入Navigator，进入base环境下，搜索matplotlib，安装，——————失败</p>
+<p>重启电脑，再次尝试“conda install matplotlib”，成功。</p>
+<p>此时输入conda list，发现matplotlib确实重新安装成功了。</p>
+<p>那么，测试：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">s = pd.Series([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, np.nan,<span class="number">44</span>,<span class="number">1</span>])</span><br><span class="line">print(s)</span><br><span class="line"> </span><br><span class="line">data = pd.Series(np.random.randn(<span class="number">1000</span>), index=np.arange(<span class="number">1000</span>))</span><br><span class="line">data = data.cumsum()</span><br><span class="line">data.plot()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
 
+<p>结果如下：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVhdfJ.jpg" alt="lVhdfJ.jpg" border="0" /></div>
 
+<p>我想了一下，可能是因为之前电脑更新驱动的原因，导致有些设置需要重启电脑才能生效，所以管理员的权限出现蜜汁bug。但这只是我个人的一个猜想。</p>
+<p>如果重启还不成功的话，就需要考虑重新安装Anaconda 甚至是重装系统来解决了。</p>
 
       
       <!-- 打赏 -->
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://jadenneal.github.io/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" data-id="ck4ntfinh0000e0pb7zz70myn"
+      <a data-url="https://jadenneal.github.io/2019/12/27/%E5%85%B3%E4%BA%8EAnaconda%E5%AE%89%E8%A3%85%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98/" data-id="ck4nwniiz0001jkpbedw39ntn"
         class="article-share-link">分享</a>
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%85%B6%E4%BB%96/" rel="tag">其他</a></li></ul>
@@ -120,19 +111,19 @@
   
   <nav class="article-nav">
     
-      <a href="/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-nav-link">
+      <a href="/2019/12/27/%E6%8F%90%E6%95%88%E5%B7%A5%E5%85%B7git%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            使用BeautifulSoup爬虫（二）
+            提效工具git的使用
           
         </div>
       </a>
     
     
-      <a href="/2019/12/27/Vs-Code-%E9%85%8D%E7%BD%AEC%E8%AF%AD%E8%A8%80%E9%97%AE%E9%A2%98/" class="article-nav-link">
+      <a href="/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Vs Code 配置C语言问题</div>
+        <div class="article-nav-title">使用BeautifulSoup爬虫（二）</div>
       </a>
     
   </nav>

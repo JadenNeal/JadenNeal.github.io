@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="下滑查看更多" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    使用BeautifulSoup爬虫（二） |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-使用BeautifulSoup爬虫（二）" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  使用BeautifulSoup爬虫（二）
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
+  <time datetime="2019-12-27T08:07:53.000Z" itemprop="datePublished">2019-12-27</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <p>目标网站：<a href="https://www.bjsubway.com/station/zjgls/#" target="_blank" rel="noopener">北京地铁</a><br>使用模块：<strong>re、os、requests、BeautifulSoup</strong></p>
+<a id="more"></a>
+
+<p>老样子，直接步入正题。<br>先看下结果：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVg1hR.jpg" alt="test.jpg" border="0"></div>
+<center>北京地铁各站点间距离一览</center>
+
+<h2 id="载入模块"><a href="#载入模块" class="headerlink" title="载入模块"></a>载入模块</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> os</span><br></pre></td></tr></table></figure>
+
+<h2 id="解析网站"><a href="#解析网站" class="headerlink" title="解析网站"></a>解析网站</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ul = <span class="string">'https://www.bjsubway.com/station/zjgls/#'</span></span><br><span class="line">response = requests.get(ul)</span><br><span class="line">response.encoding = <span class="string">'gbk'</span>  <span class="comment"># 原始网页编码错误，utf-8也不管用，只能用gbk</span></span><br><span class="line">html = response.text</span><br><span class="line"><span class="comment"># print(html)</span></span><br><span class="line">soup = BeautifulSoup(html, <span class="string">'lxml'</span>)  <span class="comment"># 变成汤汁</span></span><br></pre></td></tr></table></figure>
+
+<p>由于爬取的次数不多，对于速度没有作限制，个人猜测是有次数限制的。至于次数是多少，感兴趣的朋友可以拿自己的IP撞撞枪口[/doge]。保险的方法是加上自己的User Agent，这一点，可以从浏览器找到，以后再讲讲。</p>
+<h2 id="网站编码问题"><a href="#网站编码问题" class="headerlink" title="网站编码问题"></a>网站编码问题</h2><p>爬取的时候遇到一个网站编码的问题。使用requests爬取的时候，Requests 会基于 HTTP 头部对响应的编码作出有根据的推测。即requests会对网站进行自动编码，以保证人能看得懂，所以一般不用再另外编码。但这个网站爬取的结果里的中文却是乱码，将其重新编码为”utf-8”，发现更乱了，于是改成了“gbk”。</p>
+<p>对于requests编码问题，参见<a href="http://cn.python-requests.org/zh_CN/latest/user/quickstart.html#id3" target="_blank" rel="noopener">官方文档</a></p>
+<h2 id="分析网页源码"><a href="#分析网页源码" class="headerlink" title="分析网页源码"></a>分析网页源码</h2><p>我们想要的“菜”是线路名称以及站点信息。分析网址发现，我们的“菜”被装在’<td colspan="5">‘，即“td”tag里面。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVglN9.jpg" alt="1号线.jpg" border="0"></div>
+<center>一号线示例</center>
+
+<p>但这么找之后发现，线路不全。比如2号线就没找到，再分析2号线的代码：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVgQAJ.jpg" alt="2号线.jpg" border="0"></div>
+<center>二号线</center>
+
+<p>那再把colspan = ‘7’加进去吧，结果发现还少几条线。原来还有colspan = ‘6’ 和colspan = ‘9’（十号线，仅此一条）。这样一来，重复的代码有点多，写成一个函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_txt_name</span><span class="params">()</span>:</span>  <span class="comment"># 得到线路名称的前一步</span></span><br><span class="line">    txt_src_name = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>, <span class="number">10</span>):</span><br><span class="line">        temp = soup.find_all(<span class="string">'td'</span>, &#123;<span class="string">'colspan'</span>: str(i)&#125;)</span><br><span class="line">        txt_src_name += temp</span><br><span class="line">    <span class="keyword">return</span> txt_src_name</span><br><span class="line">    <span class="comment"># 格式如[&lt;td colspan="6"&gt;15号线相邻站间距信息统计表&lt;/td&gt;, &lt;td colspan="6"&gt;昌平线相邻站间距信息统计表&lt;/td&gt;]</span></span><br><span class="line"><span class="comment"># print(get_txt_name())  # 测试用</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_txtuseful_name</span><span class="params">()</span>:</span>  <span class="comment"># 得到可用的线路名称</span></span><br><span class="line">    obj = []</span><br><span class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> get_txt_name():</span><br><span class="line">        temp = re.findall(<span class="string">r"&gt;(.+?)&lt;"</span>, str(each))  <span class="comment"># 从&gt;匹配到&lt;(不包含)，若要包含，则先使用re.compile，再search</span></span><br><span class="line">        obj += temp</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line"><span class="comment"># print(get_txtuseful_name())  # 测试用</span></span><br></pre></td></tr></table></figure>
+<p>得到的就是包含所有线路名称的列表啦。</p>
+<h2 id="站点信息"><a href="#站点信息" class="headerlink" title="站点信息"></a>站点信息</h2><p>同样地，分析网页发现所有地站点信息都被存储在“<tbody>”这个tag中，于是同样地进行查找并筛选：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Stationinfo = soup.find_all(<span class="string">'tbody'</span>)  <span class="comment"># 汤汁是ResultSet，即结果集</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_stationinfo</span><span class="params">()</span>:</span></span><br><span class="line">    obj = []</span><br><span class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> Stationinfo:</span><br><span class="line">        temp = re.findall(<span class="string">r"&gt;(.+?)&lt;"</span>, str(each))   <span class="comment"># 正则匹配，str格式</span></span><br><span class="line">        obj += temp</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line"><span class="comment"># print(get_stationinfo())</span></span><br></pre></td></tr></table></figure>
+
+<p>到了tbody之后，剩下的数据就没有tag可用了，只能用正则表达式来匹配。查找”&gt;xxxx&lt;”的”xxx”即为站点信息。</p>
+<p>还有一点要注意，要把soup中的ResultSet转换成str格式才能调用正则表达式。 </p>
+<h2 id="写入文件"><a href="#写入文件" class="headerlink" title="写入文件"></a>写入文件</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">station_list = get_stationinfo()</span><br><span class="line"><span class="comment"># print(station_list)</span></span><br><span class="line">os.makedirs(<span class="string">'./线路图/'</span>, exist_ok=<span class="literal">True</span>)</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'./线路图/test.txt'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:  <span class="comment"># 不能是wb，编码有问题，或者str转换成byte</span></span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> station_list:</span><br><span class="line">        <span class="keyword">if</span> line == <span class="string">'上行/下行'</span>:</span><br><span class="line">            f.write(line + <span class="string">'\n'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            f.write(line + <span class="string">'      '</span>)  <span class="comment"># 多来几个空格显得好看一点</span></span><br></pre></td></tr></table></figure>
+
+<p>这里还是需要再提一下<strong>编码</strong>问题，前面是str格式的，如果写入文件的格式为’b’，即二进制，则会报错。解决的方法是第一像代码那样仅仅是’w’模式 ；或者在此之前将station_list转换成byte格式，那么使用’wb’模式就不会有问题了。</p>
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://jadenneal.github.io/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ck4nvjf1200004gpbdgxne453"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%88%AC%E8%99%AB/" rel="tag">爬虫</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+      <a href="/2019/12/27/%E5%85%B3%E4%BA%8EAnaconda%E5%AE%89%E8%A3%85%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            关于Anaconda安装库的问题
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">pycharm导入anaconda虚拟环境问题</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2015-2019
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>
