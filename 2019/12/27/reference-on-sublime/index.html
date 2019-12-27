@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    sublime Text3插入参考文献问题 |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-reference-on-sublime" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  sublime Text3插入参考文献问题
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2019/12/27/reference-on-sublime/" class="article-date">
+  <time datetime="2019-12-27T06:44:26.000Z" itemprop="datePublished">2019-12-27</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <p>最近在使用sublime Text3写latex，一切顺利，结果到了最后的插入参考文献部分却遇到了问题。于是将问题记录下来。</p>
+<a id="more"></a>  
+<p>由于本人是个新手，所以先到网上找一找教程。结果大体都是这么说的：</p>
+<ol>
+<li><p>找到<strong>bibTex</strong>格式的文献，复制粘贴将其保存为<code>.bib</code>格式的文件。</p>
+</li>
+<li><p>在latex文档中插入以下几条命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">\renewcommand\refname&#123;参考文献&#125; % 可选 </span><br><span class="line">% 这是为了将默认的reference标题改成参考文献，注意documentclass是article。</span><br><span class="line">% 若是book格式，改成\renewcommand&#x2F;bibname&#123;参考文献&#125;。</span><br><span class="line">\bibliographystyle&#123;plain&#125; % 必选 </span><br><span class="line">% 类型，plain为标准格式，按照字母的序号排列，次要比较为作者、年度和标题。</span><br><span class="line">% unsrt，按照插入参考文献的顺序依次插入。</span><br><span class="line">% alpha，用作者名首字母+年份后两位作标号，以字母顺序排列。</span><br><span class="line">% abbrv，类似plain，将月份全拼改为缩写，更显紧凑。</span><br><span class="line">% ieeetr，国际电气电子工程师协会期刊样式。</span><br><span class="line">% acm，美国计算机学会期刊样式。</span><br><span class="line">% siam，美国工业和应用数学学会期刊样式</span><br><span class="line">% apalike，美国心理学学会期刊样式</span><br><span class="line">\bibliography&#123;ref&#125;   % 必选</span><br><span class="line">% 前面创建的.bib文件，名称为ref.bib，这里只需要填写后缀前的名称即可</span><br><span class="line">% 因此只需要维护ref.bib文件就能完成参考文献的管理。</span><br></pre></td></tr></table></figure></li>
+<li><p>然后，对于需要引用参考文献的位置，插入<code>\cite{keyword}</code>，这个<code>keyword</code>为<code>@article</code>后面的内容。这里也举个例子。比如有一段参考文献是下面这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;神经网络自适应学习率改进,</span><br><span class="line">author&#x3D;&#123;朱振国 and 田松禄&#125;,</span><br><span class="line">title&#x3D;&#123;基于权值变化的BP神经网络自适应学习率改进研究&#125;,</span><br><span class="line">journal&#x3D;&#123;计算机系统应用&#125;,</span><br><span class="line">year&#x3D;&#123;2018&#125;,</span><br><span class="line">volume&#x3D;&#123;27&#125;,</span><br><span class="line">number&#x3D;&#123;7&#125;,</span><br><span class="line">pages&#x3D;&#123;205-210&#125;,</span><br><span class="line">month&#x3D;&#123;8&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么这个<code>keyword</code>就是<code>神经网络自适应学习率改进</code>。</p>
+</li>
+<li><p>然后是四次编译。</p>
+<ul>
+<li>先用xelatex编译*.tex文件</li>
+<li>再用bibtex编译*.bib文件</li>
+<li>再用xelatex编译*.tex文件</li>
+<li>再用xelatex编译*.tex文件</li>
+</ul>
+</li>
+<li><p>然后，我也是按照该流程先编译了<code>*.tex</code>文件，然后想要编译<code>*.bib</code>文件时，却发现根本没有<code>bibtex</code>的编译选项!但是搜来搜去大家都是这么说的，于是我就迷茫了。</p>
+</li>
+<li><p>寻找答案的路程是辛苦的，不卖关子，直接上解决方法。</p>
+</li>
+</ol>
+<p>其实，<code>sublime text3</code>不需要编译<code>.bib</code>文件，因为<code>Latex Tools</code>会自动帮你完成，因此，你只要做一件事，使用<strong><code>script builder</code></strong>编译<code>.tex</code>文件即可。<br>但是，首先需要配置该编译选项（主要是windows那里，其他系统不敢保证）。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcVMxx.jpg" alt="EcVMxx.jpg" border="0" height="50%" width="50%"></div>  
+其中`xelatex`为推荐的选项，当然也可以改成古老的`pdflatex`或者还有点bug的`lualatex`。改完这一句后，保存后重启软件即可。  
+接着，记得切换为英文输入法，然后按`ctrl+shift+B`选择`script builder`即可。也可以`tools -> build with -> script builder`。  
+然后就能看到结果了。
+
+<p>最后举一个自己的实例。<br>首先，创建<code>.bib</code>文件，名称为<code>ref.bib</code>。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcVlM6.jpg" alt="bib.jpg" border="0" height="50%" width="50%"></div>
+
+<p>接着，在自己的文档中，确切地说在<code>\begin{document}</code>和<code>end{document}</code>中间插入以下语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">\renewcommand\refname&#123;参考文献&#125;</span><br><span class="line">\bibliographystyle&#123;plain&#125;</span><br><span class="line">\bibliography&#123;ref&#125;     % 需要维护ref.bib文件</span><br></pre></td></tr></table></figure>
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcV1sK.jpg" alt="code_1.jpg" border="0" height="50%" width="50%"></div>
+确保能使用参考文献。  
+然后，在需要引用的地方加上`\cite{keyword}`。  
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcVni9.jpg" alt="code_2.jpg" border="0" height="50%" width="50%"></div>  
+然后，快捷键`ctrl+shift+B`选择`script builder`
+
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcVKR1.jpg" alt="build.jpg" border="0" height="50%" width="50%"></div>
+
+<p>即可看到编译成功以及结果显示。  </p>
+<div align="center"><img src="https://s2.ax1x.com/2019/05/08/EcVuGR.jpg" alt="EcVuGR.jpg" border="0" height="70%" width="70%"></div> 
+
+
+
+
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/27/reference-on-sublime/" data-id="ck4nsl2bl0000tcpb34do6mab"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/latex/" rel="tag">latex</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+      <a href="/2019/12/27/Vs-Code-%E9%85%8D%E7%BD%AEC%E8%AF%AD%E8%A8%80%E9%97%AE%E9%A2%98/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Vs Code 配置C语言问题
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/12/27/%E4%BD%BF%E7%94%A8BeautifulSoup%E7%88%AC%E8%99%AB(%E4%B8%80)/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">使用BeautifulSoup爬虫（一）</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2015-2019
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>

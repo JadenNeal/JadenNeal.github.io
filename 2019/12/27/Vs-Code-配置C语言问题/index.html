@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    Vs Code 配置C语言问题 |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-Vs-Code-配置C语言问题" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Vs Code 配置C语言问题
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2019/12/27/Vs-Code-%E9%85%8D%E7%BD%AEC%E8%AF%AD%E8%A8%80%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2019-12-27T06:53:06.000Z" itemprop="datePublished">2019-12-27</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <p><strong>写在最前，本篇文章是针对Windows系统上gdb调试失败问题的，有关完整配置教程，直接参见末尾的参考资料。</strong></p>
+<a id="more"></a>
+<h1 id="Vs-code配置C语言"><a href="#Vs-code配置C语言" class="headerlink" title="Vs code配置C语言"></a>Vs code配置C语言</h1><p>最近需要用到C，但是VS太大了，对付一般小项目有点大材小用，所以请出小巧的Vs Code，自带markdown书写，插件居多，很好用就是了。<br>那么，配置C/C++该怎么搞呢？  </p>
+<ol>
+<li>下载vs code</li>
+<li>下载MinGW</li>
+<li>配置json文件</li>
+<li>代码测试</li>
+</ol>
+<h2 id="下载vs-code"><a href="#下载vs-code" class="headerlink" title="下载vs code"></a>下载vs code</h2><p>这一步无需多言，打开必应搜<strong>vs code</strong>即可（当然用百度也不拦着，就是需要找一下官网）。<br>具体网址：<a href="https://code.visualstudio.com/" target="_blank" rel="noopener">https://code.visualstudio.com/</a></p>
+<h2 id="下载MinGW"><a href="#下载MinGW" class="headerlink" title="下载MinGW"></a>下载MinGW</h2><p>从<a href="https://osdn.net/projects/mingw/downloads/68260/mingw-get-setup.exe/" target="_blank" rel="noopener">这里</a>下载。然后点击安装，路径可选。<br><strong>安装完成之后，将bin目录加入到环境变量。</strong></p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVwG1e.png" alt="env_var.png" border="0" heigh="60%" width="60%"></div>  
+
+<p>但值得注意的是，<strong>这一步后来经过检查是失败的，</strong>见下面<code>launch.json</code>的配置。因此使用的是dev c++中的MinGW，直接下载<a href="https://sourceforge.net/projects/orwelldevcpp/" target="_blank" rel="noopener">dev c++</a>即可。相应的MinGW的bin目录也应添加到环境变量中。  </p>
+<h2 id="配置json文件"><a href="#配置json文件" class="headerlink" title="配置json文件"></a>配置json文件</h2><p>其实没必要新建c工程，再依次生成json，再进行修改，而是直接新建相应的json文件即可。<br>有三个json文件：</p>
+<ul>
+<li>c_cpp_properties.json</li>
+<li>launch.json</li>
+<li>tasks.json</li>
+</ul>
+<p>然后是具体配置：</p>
+<ul>
+<li><p>c_cpp_properties.json</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"configurations"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"Win32"</span>,</span><br><span class="line">            <span class="attr">"includePath"</span>: [</span><br><span class="line">                <span class="string">"$&#123;workspaceFolder&#125;/**"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"defines"</span>: [</span><br><span class="line">                <span class="string">"_DEBUG"</span>,</span><br><span class="line">                <span class="string">"UNICODE"</span>,</span><br><span class="line">                <span class="string">"_UNICODE"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"windowsSdkVersion"</span>: <span class="string">"8.1"</span>,</span><br><span class="line">            <span class="attr">"compilerPath"</span>: <span class="string">"D:\\MinGW\\bin\\gcc.exe"</span>,  <span class="comment">//MinGW的bin目录下的gcc.exe路径</span></span><br><span class="line">            <span class="attr">"cStandard"</span>: <span class="string">"c11"</span>,</span><br><span class="line">            <span class="attr">"cppStandard"</span>: <span class="string">"c++17"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"version"</span>: <span class="number">4</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>launch.json</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 使用 IntelliSense 了解相关属性。 </span></span><br><span class="line">    <span class="comment">// 悬停以查看现有属性的描述。</span></span><br><span class="line">    <span class="comment">// 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387</span></span><br><span class="line">    <span class="attr">"version"</span>: <span class="string">"0.2.0"</span>,</span><br><span class="line">    <span class="attr">"configurations"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"(gdb) Launch"</span>,</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"cppdbg"</span>,</span><br><span class="line">            <span class="attr">"request"</span>: <span class="string">"launch"</span>,</span><br><span class="line">            <span class="attr">"program"</span>: <span class="string">"$&#123;workspaceFolder&#125;/$&#123;fileBasenameNoExtension&#125;.exe"</span>,<span class="comment">// 被调试程序</span></span><br><span class="line">            <span class="attr">"args"</span>: [],</span><br><span class="line">            <span class="attr">"stopAtEntry"</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"cwd"</span>: <span class="string">"$&#123;workspaceFolder&#125;"</span>,</span><br><span class="line">            <span class="attr">"environment"</span>: [],</span><br><span class="line">            <span class="attr">"externalConsole"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"MIMode"</span>: <span class="string">"gdb"</span>,</span><br><span class="line">            <span class="attr">"miDebuggerPath"</span>: <span class="string">"D:\\DevC++\\Dev-Cpp\\MinGW64\\bin\\gdb.exe"</span>,  <span class="comment">// 自己电脑的gdb</span></span><br><span class="line">            <span class="attr">"preLaunchTask"</span>: <span class="string">"echo"</span>,                      <span class="comment">// 在调试前需要执行的任务名称</span></span><br><span class="line">            <span class="attr">"setupCommands"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"description"</span>: <span class="string">"Enable pretty-printing for gdb"</span>,</span><br><span class="line">                    <span class="attr">"text"</span>: <span class="string">"-enable-pretty-printing"</span>,</span><br><span class="line">                    <span class="attr">"ignoreFailures"</span>: <span class="literal">true</span></span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>诶？到这一步，里面的<code>miDebuggerPath</code>中的<code>dev c++</code>从哪冒出来的呢？<br>因为到后面，本人发现只要是从官网下载下来的MinGW，写成该路径，断点调试后总会跳出下图所示的错误。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVwQk6.png" alt="error.png" border="0" heigh="60%" width="60%"></div>
+
+</li>
+</ul>
+<p>经过一番搜索，在<a href="https://stackoverflow.com/questions/47639685/gdb-error-not-in-executable-format-file-format-not-recognized" target="_blank" rel="noopener">stackoverflow</a>上找到了答案，这里为了方便大家，截图解决方案。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVwltK.png" alt="solution.png" border="0" heigh="60%" width="60%"></div>
+
+<p>意思是gcc版本不对，必须使用64位的。<br>那么用官网的为什么不行呢？额，在源程序添加断点后，在<code>Terminal</code>中输入<code>gdb test.c</code>，得到以下提示：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVw8pD.png" alt="mingw32.png" border="0" heigh="60%" width="60%"></div>
+
+<p>原来自带的是32位的，问题就是出在这里，<strong>但我目前确实没找到用哪个才是64位的。</strong><br><strong>所以换个思路，不就是需要MinGW吗？除了官网还有许多替代品，因此还有许多可选选项。</strong><br>正好本人电脑上有dev c++，于是直接用的自带的gcc编译器，结果通过了。<br>有大佬能解答下最好。</p>
+<ul>
+<li>tasks.json<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="comment">// See https://go.microsoft.com/fwlink/?LinkId=733558</span></span><br><span class="line">    <span class="comment">// for the documentation about the tasks.json format</span></span><br><span class="line">    <span class="attr">"version"</span>: <span class="string">"2.0.0"</span>,</span><br><span class="line">    <span class="attr">"tasks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"label"</span>: <span class="string">"echo"</span>,</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"shell"</span>,</span><br><span class="line">            <span class="attr">"command"</span>: <span class="string">"gcc"</span>,  <span class="comment">//c语言用gcc，c++用g++</span></span><br><span class="line">            <span class="attr">"args"</span>: [</span><br><span class="line">                <span class="string">"-g"</span>,</span><br><span class="line">                <span class="string">"$&#123;file&#125;"</span>,</span><br><span class="line">                <span class="string">"-o"</span>,</span><br><span class="line">                <span class="string">"$&#123;fileBasenameNoExtension&#125;.exe"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"problemMatcher"</span>: [</span><br><span class="line">                <span class="string">"$gcc"</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+至此，json文件就配置完成了。</li>
+</ul>
+<h2 id="代码测试"><a href="#代码测试" class="headerlink" title="代码测试"></a>代码测试</h2><p>输入以下代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This is a test!"</span>);</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> j = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> k;</span><br><span class="line">    k = i + j;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n k"</span>);</span><br><span class="line">    getchar();      <span class="comment">// 防止一闪而过</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果截图：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVwJ6H.png" alt="test.png" border="0" heigh="60%" width="60%"></div>
+
+<h2 id="额外的说明"><a href="#额外的说明" class="headerlink" title="额外的说明"></a>额外的说明</h2><p>多啰嗦几句。<br>其实，单纯编译运行c程序的话只需要<code>gcc</code>就可以；同理，单纯编译运行C++程序的话只需要<code>g++</code>就可以了。<code>gdb</code><strong>只是为了调试用</strong>。  </p>
+<p>于是有人就会问，可是vs code只有调试按钮啊，如果安装了官网下载的MinGW，只要按了<code>F5</code>，就会<code>unable to start debugging ···</code>，怎么直接运行呢？<br>很简单，用最原始的命令行解决。</p>
+<h3 id="命令行编译运行c程序"><a href="#命令行编译运行c程序" class="headerlink" title="命令行编译运行c程序"></a>命令行编译运行c程序</h3><p>首先，新建一个C程序，命名为<code>test.c</code>，然后编写。<br>接着，在<code>Terminal</code>中输入<code>gcc test.c -o test</code>，意思是编译<code>test.c</code>文件，生成<code>test.exe</code>。<br>然后，再在终端输入<code>test</code>，即可看到输出。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/27/lVwYXd.png" alt="example.png" border="0" heigh="60%" width="60%"></div>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>vs code配置c/c++的方法基本一致，都是下载完之后，将其添加到系统环境变量，再配置相关的json文件即可。本人出问题的时候搜索了大量的教程，也遇到了按照教程配置结果出问题的朋友。比如</p>
+<ul>
+<li>错误，退出代码为1</li>
+<li>任务被重用（讲道理，这个不算错误，配置没问题的话是可以正常运行的）</li>
+<li>错误，退出代码为2</li>
+<li>错误，启动调试失败（unable to start debugging…）</li>
+<li>…</li>
+</ul>
+<p>个人建议还是搜索错误的关键字，有条件就google，没条件就Bing，百度作最后的备选，相信可以在各种博客、github、代码社区找到相应的问题解决方案。<br>这里本人遇到的是启动调试失败，然后使用dev c++的MinGW就成功了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><a href="https://www.520mwx.com/view/32843" target="_blank" rel="noopener">暮无雪代码博客</a></li>
+<li><a href="https://stackoverflow.com/questions/47639685/gdb-error-not-in-executable-format-file-format-not-recognized" target="_blank" rel="noopener">stackoverflow上关于调试失败问题的解答</a></li>
+</ol>
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/27/Vs-Code-%E9%85%8D%E7%BD%AEC%E8%AF%AD%E8%A8%80%E9%97%AE%E9%A2%98/" data-id="ck4nsvlwn0000k4pb3jvler90"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%85%B6%E4%BB%96/" rel="tag">其他</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+      <a href="/2019/12/27/pycharm%E5%AF%BC%E5%85%A5anaconda%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E9%97%AE%E9%A2%98/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            pycharm导入anaconda虚拟环境问题
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2019/12/27/reference-on-sublime/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">sublime Text3插入参考文献问题</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2015-2019
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>
