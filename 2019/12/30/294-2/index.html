@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="下滑查看更多" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    第二讲-监督学习和模仿学习（二） |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-294-2" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  第二讲-监督学习和模仿学习（二）
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2019/12/30/294-2/" class="article-date">
+  <time datetime="2019-12-30T06:52:34.000Z" itemprop="datePublished">2019-12-30</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <p>继续讨论的一个问题是，对于模仿学习来说，不需要增加很多数据也能表现很好吗？我们是否可以做到不让人坐下来看策略观察到的图像，机器也可以工作的很好呢？</p>
+<a id="more"></a>
+
+<p>\(DAgger\)解决的是分布偏差的问题，但仔细想一想，如果模型很棒，没有误差（或误差非常小）呢？分布偏差的问题将不复存在。因此，找到这样一个模型也是解决问题的途径之一。从而我们可以改进模型，非常精确地去模仿动作，达到这一目的。但注意别过拟合。</p>
+<h2 id="为什么有可能拟合专家数据失败"><a href="#为什么有可能拟合专家数据失败" class="headerlink" title="为什么有可能拟合专家数据失败"></a>为什么有可能拟合专家数据失败</h2><p>原因有以下几点：</p>
+<ol>
+<li><strong>非马尔可夫行为</strong>。对于人类来说，即使一个人观察的图像包含了能够使他做出最优决策的所有信息，他还是有可能重复自己在过去决策中的选择。</li>
+<li><strong>多模型行为</strong>。即使人们表现出近似于马尔可夫的行为决策，他们也可能只是想要在相似的情况下做一些不同的事情。这么说有点难以理解。举个例子，一个人今天心情好，开车就会平稳一些，基本上会按照规则驾驶；如果一个人今天心情不好，那么开车就可能会激进一些，旋转方向盘的幅度会较大。又比如今天只用左手开车，或者只用右手…这些情况下展现的都是多模型行为。</li>
+</ol>
+<h2 id="非马尔可夫行为的讨论"><a href="#非马尔可夫行为的讨论" class="headerlink" title="非马尔可夫行为的讨论"></a>非马尔可夫行为的讨论</h2><p>如果怀疑示范者（即被模仿者）做的决策不仅取决于现在，并且还和他过去的经验有关，那么我们也可以让机器的决策变得也是既和现在也与过去有关。</p>
+<p>前向NN就是仅依赖于当前观察数据的图像分类问题，就是说，如果机器看见一个事物两次， 那么两次都会做出同样的决策。但这显然不能满足人们的需要。</p>
+<p>要想让机器和人类一样，能够使用过去的经验来进行决策，人们可以使用不同的NN的结构来做到这一点。最简单最大众的方法就是使用递归NN</p>
+<p><strong>如何做呢？</strong></p>
+<p>首先明确一点，即使我们有所有的历史经验的数据，我们也不会完全去使用它。而是采用下图的方法。</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/30/lMwCxx.jpg" alt="lMwCxx.jpg" border="0" ></div>
+<center>图片来自cs294课程ppt</center>
+对于输入图像的每一帧都采用卷积编码器来处理，并且所有的卷积编码器的权值将共享，最后，在所有的编码器上再放置一个RNN（循环神经网络），来提取卷积编码器塔的输出，并在时间上进行前向的积累。 
+
+<h2 id="多模型行为的讨论"><a href="#多模型行为的讨论" class="headerlink" title="多模型行为的讨论"></a>多模型行为的讨论</h2><p>一个<strong>引例</strong>：<br>对于一棵树，我们可以从左边绕过，也可以从右边绕过，两种方法都是可行的，但是综合这两种就不行了。<br>上面的例子体现了一种多模型的方法。  </p>
+<ol>
+<li>如果我们进行的是一种<strong>离散</strong>的行为，多模型的方法完全没有问题。典型做法就是再网络结构的最后放置一个softmax函数。这可以呈现出基于随机变量类别的完整分布。因此，如果是离散决策行为的话，我们可以把行为集中再向左和向右的决策上，把中间的决策空出来，就可以了。</li>
+<li>如果进行的是<strong>连续</strong>的行为，情况会复杂一点。最普遍的做法是训练能输出连续行为决策的规则体系。<br>我们可以使用<strong>高斯分布</strong>实现它。<br>假设我们使用了<strong>方均损失函数</strong>，其实这就是在用高斯分布，原因在于方均误差就是高斯分布的对数概率。<br><strong>但是，倘若我们输出高斯分布的均值或者方差，结果都将是一个单峰的分布。用该模型拟合数据的话，就会得到绝对不想要的结果</strong>。于是我们必须在高斯分布的基础上做一些调整，来使它能应对<strong>多状态</strong>的情况。于是有下面几种选择：  <ul>
+<li>输出<strong>混合的高斯分布</strong>。这是最简单的一种方法。  </li>
+<li>输出<strong>隐变量模型</strong>。这个在数学上很优雅，但实现起来很困难。</li>
+<li><strong>自动回归离散化(Autoregressive discretization)</strong>。这种方法可能在形式上不太工整，但是相比较于隐变量模型，实现起来会容易不少。</li>
+</ul>
+</li>
+</ol>
+<h2 id="混合高斯分布（mixture-of-Gaussians）"><a href="#混合高斯分布（mixture-of-Gaussians）" class="headerlink" title="混合高斯分布（mixture of Gaussians）"></a>混合高斯分布（mixture of Gaussians）</h2><p>继续上面的讨论，混合高斯分布是为了应对多模型行为。</p>
+<p>它的输出是N个均值N个方差，对于所有的选项都有一个标量权重，这些标量权重的和是1，即$$\sum 标量权重 = 1$$<br>它的模型如下：</p>
+<div align="center"><img src="https://s2.ax1x.com/2019/12/30/lMce2Q.jpg" alt="lMce2Q.jpg" border="0" /></div>
+<center>注意这里是多峰的</center>
+我们要在最后使用$softmax$函数，然后均值和方差就会在NN中起到一定作用，输出的就会使混合高斯分布模型的参数。
+
+<p>这种方法被称为<strong>混合密度网络</strong>。</p>
+<p>在设计这种模型的时候，最关键的是<strong>选择混合分布的元素数量</strong>。通常来说我们不可能用有限数量元素的分布来表示任意的分布，因此，在现实中就意味着，在低维度的情况下，假设有一个或两个维度的行为决策，这种方法就会非常奏效。</p>
+<p>然而在高维度的情况下，N个选择的机制就不太行得通。</p>
+<h2 id="隐变量模型（Latent-variable-models）"><a href="#隐变量模型（Latent-variable-models）" class="headerlink" title="隐变量模型（Latent variable models）"></a>隐变量模型（Latent variable models）</h2><p>隐变量模型不要求我们对输出进行改动，输出仍然以一种像单峰高斯分布模型的简单形式存在。不同之处在于，该模型在NN的底部接入额外的输入，这些额外的输入是一些随机数，这些随机数可能是从高斯分布或者均匀分布中采样得到的。</p>
+<p>这样我们就可以用这些随机性来训练我们的NN，以实质地改变输出的分布。</p>
+<p>举例进行理解。如果我们面对向左向右的问题，网络将会在噪声进入的时候进行学习。对于一维的情况，若是负面（也可以说是负方向）的噪声，NN的输出就是向左，反之则是右。</p>
+<p><strong>但是</strong>，这种方法只是听起来不错。从原理上说，它是利用NN表现能力的技术（NN是一个普适的函数逼近器），所以NN可以把噪声转换为在输出时的任何分布。<strong>但是</strong>，在某种程度上NN需要噪声。在现实中怎么做呢？有些困难，简单地引入噪声然后用最大似然是行不通的（效果不理想），需要查找相关论文。</p>
+<h2 id="自动回归离散化"><a href="#自动回归离散化" class="headerlink" title="自动回归离散化"></a>自动回归离散化</h2><p>最简单的方法，但应用起来需要自己改动的地方较多。</p>
+<ol>
+<li>对于离散的动作决策，基本没有问题。</li>
+<li>但对于连续的动作决策，就没那么简单了。  <ul>
+<li>如果能够将连续情况离散化地很好，那么使用该方法也没问题。</li>
+<li>但如果离散化的是一个高维的变量，那么问题就会变得很棘手，会产生维度灾难——维度指数性增长（二线性增长则是可以接受的）。<strong>自动回归离散化</strong>也正是主要应对这种情况提出来的。</li>
+</ul>
+</li>
+</ol>
+<p>它的思想如下：</p>
+<ol>
+<li>首先处理行为决策的第一个维度，对其进行离散化，使用softmax</li>
+<li>接着从分布中采样，就得到了行为决策的第一个结果——动作的维度</li>
+<li>将这个离散化采样送入别的NN，<strong>让这个NN结合第一个维度的所有采样以及第二个维度的条件</strong>，来预测一个离散化的结果。</li>
+<li>之后重复上述的过程即可。</li>
+</ol>
+<h2 id="模仿学习的问题"><a href="#模仿学习的问题" class="headerlink" title="模仿学习的问题"></a>模仿学习的问题</h2><ol>
+<li>人们需要提供数据，但这其实是很有限的。<strong>深度学习在数据充足的情况下，学习效果是最好的</strong>。这句话的隐藏含义是，有时候我们系统的性能瓶颈，在一开始就由数据量决定了。</li>
+<li>虽然人们在一些问题上擅长提供示范作用，但有些情况下却不能。比如人们擅长于走山路，驾驶等；但是对于一些更为精细的情况，比如告诉机器电机该转多快，演示如何打败世界冠军等，这些就做不来。因此，模仿学习并不能应用在所有领域。</li>
+<li>最后，人类可以自动学习，但是要想让机器自动学习，过程会很麻烦。后续会讲。</li>
+</ol>
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://jadenneal.github.io/2019/12/30/294-2/" data-id="ck4s3733400009wpb459xggqz"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+    
+      <a href="/2019/12/29/294-1/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">第二讲-监督学习和模仿学习（一）</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2015-2019
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>
