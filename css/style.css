@@ -5845,6 +5845,7 @@ button {
 .tag-list > .tag-list-item {
   display: inline-block;
   padding: 0.5rem 1rem;
+  font-size: 120%;
 }
 .tag-list > .tag-list-item:before {
   content: "\eec3";
@@ -6784,18 +6785,21 @@ a.toc-link {
 }
 .article-entry pre,
 .article-entry .highlight {
-  background: #f6f8fa;
+  background: #2d2d2d;
   padding: 1.5rem;
   margin: 1.5rem 0;
   -webkit-border-radius: 0.4rem;
   -moz-border-radius: 0.4rem;
   border-radius: 0.4rem;
   overflow: auto;
-  color: #4d4d4c;
+  color: #dedede;
 }
 .article-entry .highlight .gutter pre,
 .article-entry .gist .gist-file .gist-data .line-numbers {
   color: #8e908c;
+}
+.article-entry ol>li>ul {
+  padding-inline-start: 2rem;
 }
 .article-entry pre,
 .article-entry code {
@@ -6803,8 +6807,9 @@ a.toc-link {
   text-shadow: none;
 }
 .article-entry code {
-  background: #f6f8fa;
-  padding: 0.25rem;
+  color: #c7254e;
+  background: #f2f2f2;
+  padding: 0.25rem 0.6rem;
   -webkit-border-radius: 0.4rem;
   -moz-border-radius: 0.4rem;
   border-radius: 0.4rem;
@@ -6856,10 +6861,10 @@ a.toc-link {
   height: inherit;
 }
 .article-entry .highlight .line.marked {
-  background: #d6d6d6;
+  background: #000;
 }
 .article-entry .gist {
-  background: #f6f8fa;
+  background: #2d2d2d;
 }
 .article-entry .gist .gist-file {
   border: none;
@@ -6882,7 +6887,7 @@ a.toc-link {
   border: none;
 }
 .article-entry .gist .gist-file .gist-meta {
-  background: #f6f8fa;
+  background: #2d2d2d;
   color: #8e908c;
   padding: 0;
   margin-top: 1rem;
