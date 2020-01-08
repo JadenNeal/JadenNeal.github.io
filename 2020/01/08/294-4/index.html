@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    策略梯度简介（一） |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-294-4" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  策略梯度简介（一）
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/01/08/294-4/" class="article-date">
+  <time datetime="2020-01-08T14:24:02.000Z" itemprop="datePublished">2020-01-08</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <p>讲解policy Gradients的概述及问题。</p>
+<a id="more"></a>
+
+<h2 id="目标-最大化奖励"><a href="#目标-最大化奖励" class="headerlink" title="目标-最大化奖励"></a>目标-最大化奖励</h2><p>在强化学习中，我们需要找到一种策略，为之加入某些状态，最后得到一个奖励最大的策略。有下面这个函数。<br>$$\theta^* = \arg \max_{\theta} E_{\tau\sim p_{\theta}(\tau)}\left[\sum_tr(s_t, a_t)\right]$$<br>这是一个对复杂概率分布求期望的形式，并且数据维度很大（为$R^n$）。<br>对它求解是非常困难的，只能求取近似值。</p>
+<p>现在，记$$J(\theta) = E_{\tau\sim p_{\theta}(\tau)}\left[\sum_tr(s_t, a_t)\right]$$<br>那么该如何估计呢？</p>
+<p>答案是对分布进行采样，更进一步说是<strong>逐步地执行策略</strong>$\pi_\theta$。因此，得到的估计式为$$J(\theta) = E_{\tau\sim \pi_{\theta}(\tau)}\left[\sum_tr(s_t, a_t)\right] = \frac{1}{N}\sum_i\sum_tr(s_{i,t}, a_{i,t})$$</p>
+<h2 id="提升估计值"><a href="#提升估计值" class="headerlink" title="提升估计值"></a>提升估计值</h2><p>得到了估计值后，我们想要提升该估计值，标准的做法是求取$J(\theta)$对变量$\theta$的梯度，然后沿着<strong>梯度方向进行操作</strong>。这里我们的目标是使$J(\theta)$最大化，因此我们需要对$J(\theta)$进行<strong>梯度上升</strong>。为此我们需要先求得梯度，再对其乘以一个系数，最后加到网络参数上。</p>
+<h3 id="求梯度"><a href="#求梯度" class="headerlink" title="求梯度"></a>求梯度</h3><p>首先，将奖励函数的求和记为以下式子：$$r(\tau) = \sum_{t=1}^Tr(s_t, a_t)$$<br>显然，$r(\tau)$表示奖励函数的叠加。</p>
+<p>由此，我们可以将$J(\theta)$改写为积分式：$$J(\theta) = \int\pi_{\theta}(\tau)r(\tau),d\tau$$</p>
+<p>所以，$J(\theta)$的梯度就是$$\nabla_{\theta} J(\theta) = \int\nabla_{\theta}\pi_{\theta}(\tau)r(\tau),d\tau$$<br>其中，$\nabla_{\theta}$表示变量是$\theta$的梯度。  </p>
+<p>在数学教材中，有下面的公式：<br>$$\pi_{\theta}(\tau)\nabla_{\theta}\log \pi_{\theta}(\tau) = \pi_{\theta}(\tau) \frac{\nabla_{\theta}\pi_{\theta}(\tau)}{\pi_{\theta}(\tau)} = \nabla_{\theta}\pi_{\theta}(\tau)$$</p>
+<p>于是，就有$$\nabla_{\theta} J(\theta) = \int\nabla_{\theta}\pi_{\theta}(\tau)r(\tau),d\tau = \int\pi_{\theta}(\tau)\nabla_{\theta}\log \pi_{\theta}(\tau)r(\tau),d\tau = E_{\tau\sim \pi_{\theta}(\tau)}[\nabla_{\theta}\log \pi_{\theta}(\tau)r(\tau)]$$<br>而$\pi_{\theta}(\tau)$是一系列由状态和动作组成的<strong>联合概率</strong>的缩写，即<br>$$\pi_{\theta}(\tau) = \pi_{\theta}(s_1,a_1,\dots,s_T,a_T) = p(s_1)\prod_{t=1}^{T}\pi_{\theta}(a_t|s_t)p(s_{t+1}|s_t, a_t)$$<br>两边取对数，得：$$\log\pi_{\theta}(\tau) = \log p(s_1)+ \sum_{t=1}^{T}\log\pi_{\theta}(a_t|s_t) + \log p(s_{t+1}|s_t, a_t)$$<br>将此式代入到$\nabla_{\theta} J(\theta)$中，则第一项和第三项对$\theta$求梯度均为0，所以，$$\nabla_{\theta} J(\theta) = E_{\tau\sim \pi_{\theta}(\tau)}\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t=1}^Tr(s_{i, t},a_{i,t}\right)\right]$$<br>和之前一样，这个式子，同样求不出解析解，因此必须像前面那样用采样值来估计它得近似值。则有$$\nabla_{\theta} J(\theta) \approx \frac{1}{N}\sum_{i=1}^N\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t=1}^Tr(s_{i, t},a_{i,t}\right)\right]$$<br>最后一步，将更新的策略赋值回去即可改进策略。$$\theta \leftarrow \theta + \alpha \nabla_{\theta}J(\theta)$$</p>
+<p>不过，值得一提的是，该流程实现的效果不好，后续会有优化步骤。</p>
+<h2 id="策略梯度的问题"><a href="#策略梯度的问题" class="headerlink" title="策略梯度的问题"></a>策略梯度的问题</h2><p><strong>策略梯度的问题实际上是方差问题</strong>。通过有限的样本去估计梯度，需要重复多次，每次计算都得到不同的估值，对于少量有限的样本来说，这些估值会有很大的差异。</p>
+<p>究其原因，是因为该方法是沿着梯度方向而不是直线轨迹方向进行优化，因此估值会“到处乱跑”。如果摆动的幅度大于我们朝着目标点所作的优化，那么最后会收敛在一个较差的位置，或者需要相当长的时间才能收敛，或者需要非常小的步进。</p>
+<h2 id="降低方差"><a href="#降低方差" class="headerlink" title="降低方差"></a>降低方差</h2><h3 id="引入因果性假设"><a href="#引入因果性假设" class="headerlink" title="引入因果性假设"></a>引入因果性假设</h3><p>首先引入一个因果性的假设：当$t &lt; t^{‘}$时，策略在$t^{‘}$时刻的奖励不会影响$t$时刻的。通俗点说就是未来不会影响过去。</p>
+<p>从而可以得到$$\nabla_{\theta} J(\theta) \approx \frac{1}{N}\sum_{i=1}^N\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t^{‘}=t}^Tr(s_{i, t^{‘}},a_{i,t^{‘}}\right)\right]$$</p>
+<p>解释一下为什么这么做就可以减小方差。注意到上面的式子$t^{‘}$是从$t$开始的，已经减去了前面的结果（即$1\sim t$得部分），这个和变小了，所以方差也变小了。</p>
+<h3 id="引入基线（Baseline）"><a href="#引入基线（Baseline）" class="headerlink" title="引入基线（Baseline）"></a>引入基线（Baseline）</h3><p>需要明确的一点是，人们对不直观的梯度下降问题的策略是让策略梯度拿到好动作，使其可能性增加，而坏的动作的可能性则降低。</p>
+<p>但事实不完全是这样，假设奖励都是正的，那么所有动作的概率都会提高。</p>
+<p><strong>我们真正想做的，就是提高好的动作的可能性，降低坏的动作的可能性</strong>。  </p>
+<p>做法就是用每一次奖励减去奖励的均值，然后进行比较，正的则增加可能性，负的则减少可能性。</p>
+<p>首先，记$$b = \frac{1}{N}\sum_{i=1}^Nr(\tau)$$<br>表示奖励的均值，称之为<strong>基线Baseline</strong>。</p>
+<p>因此，可以将上面求梯度的式子改写为<br>$$\nabla_{\theta} J(\theta) \approx \frac{1}{N}\sum_{i=1}^N\nabla_{\theta}\log\pi_{\theta}(\tau)[r(\tau) - b]$$</p>
+<p>为了证明这个式子的正确性，只需要证明$$E\left\{\frac{1}{N}\sum_{i=1}^N\nabla_{\theta}\log\pi_{\theta}(\tau)[r(\tau) - b]\right\} = E\left\{\frac{1}{N}\sum_{i=1}^N\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t^{‘}=t}^Tr(s_{i, t^{‘}},a_{i,t^{‘}}\right)\right]\right\}$$<br>其中$E[\cdot]$表示期望。</p>
+<p>两式相减，化简即可得到最终需要证明的是$$E[\nabla_{\theta}\log\pi_{\theta}(\tau)b] = 0$$</p>
+<p>这其实也很容易，利用数学教材中的公式$$\pi_{\theta}(\tau)\nabla_{\theta}\log \pi_{\theta}(\tau) = \pi_{\theta}(\tau) \frac{\nabla_{\theta}\pi_{\theta}(\tau)}{\pi_{\theta}(\tau)} = \nabla_{\theta}\pi_{\theta}(\tau)$$</p>
+<p>于是$$E[\nabla_{\theta}\log\pi_{\theta}(\tau)b] = \int\pi_{\theta}(\tau)\nabla_{\theta}\log\pi_{\theta}(\tau)b,d\tau $$$$=\int\nabla_{\theta}\pi_{\theta}(\tau)b,d\tau = b\nabla_{\theta}\int\pi_{\theta}(\tau),d\tau = b\nabla_{\theta}1 = 0$$</p>
+<p>得证。</p>
+<p>这就意味着从<strong>有限样本</strong>的奖励中减去或者增加一项都不会改变期望，而方差则会改变，我们想要的结果就是<strong>期望不变，方差减小</strong>。</p>
+<h3 id="最佳基准线"><a href="#最佳基准线" class="headerlink" title="最佳基准线"></a>最佳基准线</h3><p>值得一提的是，上面的$b$不是唯一的（但均值基线相当有效），可以任意取，其中能够使得方差最小的$b$便称之为<strong>最优Baseline</strong></p>
+<p>想来也很简单，最优的则是方差梯度为0的点。不再赘述过程，直接贴出结果。<br>$$b = \frac{E[g(\tau)^2r(\tau)]}{E[g(\tau)^2]}$$</p>
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://jadenneal.github.io/2020/01/08/294-4/" data-id="ck55ec2uz0000a4pbdv4o0oj3"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+    
+      <a href="/2019/12/31/294-3/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">强化学习简介</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2016-2020
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>
