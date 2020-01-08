@@ -95,7 +95,7 @@
 <p>做法就是用每一次奖励减去奖励的均值，然后进行比较，正的则增加可能性，负的则减少可能性。</p>
 <p>首先，记$$b = \frac{1}{N}\sum_{i=1}^Nr(\tau)$$<br>表示奖励的均值，称之为<strong>基线Baseline</strong>。</p>
 <p>因此，可以将上面求梯度的式子改写为<br>$$\nabla_{\theta} J(\theta) \approx \frac{1}{N}\sum_{i=1}^N\nabla_{\theta}\log\pi_{\theta}(\tau)[r(\tau) - b]$$</p>
-<p>为了证明这个式子的正确性，只需要证明$$E\left\{\frac{1}{N}\sum_{i=1}^N\nabla_{\theta}\log\pi_{\theta}(\tau)[r(\tau) - b]\right\} = E\left\{\frac{1}{N}\sum_{i=1}^N\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t^{‘}=t}^Tr(s_{i, t^{‘}},a_{i,t^{‘}}\right)\right]\right\}$$<br>其中$E[\cdot]$表示期望。</p>
+<p>为了证明这个式子的正确性，只需要证明$$E\left\{\frac{1}{N}\sum_{i=1}^N\nabla_{\theta}\log\pi_{\theta}(\tau)[r(\tau) - b]\right\} $$$$= E\left\{\frac{1}{N}\sum_{i=1}^N\left[\left(\sum_{t=1}^T\nabla_{\theta}\log \pi_{\theta}(a_t|s_t)\right)\left(\sum_{t^{‘}=t}^Tr(s_{i, t^{‘}},a_{i,t^{‘}}\right)\right]\right\}$$<br>其中$E[\cdot]$表示期望。</p>
 <p>两式相减，化简即可得到最终需要证明的是$$E[\nabla_{\theta}\log\pi_{\theta}(\tau)b] = 0$$</p>
 <p>这其实也很容易，利用数学教材中的公式$$\pi_{\theta}(\tau)\nabla_{\theta}\log \pi_{\theta}(\tau) = \pi_{\theta}(\tau) \frac{\nabla_{\theta}\pi_{\theta}(\tau)}{\pi_{\theta}(\tau)} = \nabla_{\theta}\pi_{\theta}(\tau)$$</p>
 <p>于是$$E[\nabla_{\theta}\log\pi_{\theta}(\tau)b] = \int\pi_{\theta}(\tau)\nabla_{\theta}\log\pi_{\theta}(\tau)b,d\tau $$$$=\int\nabla_{\theta}\pi_{\theta}(\tau)b,d\tau = b\nabla_{\theta}\int\pi_{\theta}(\tau),d\tau = b\nabla_{\theta}1 = 0$$</p>
