@@ -6,7 +6,7 @@
     
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    Actor-critic算法简介 |  Jaden Neal&#39;s Blog
+    294-7.md |  Jaden Neal&#39;s Blog
   </title>
   
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -30,7 +30,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-294-6" class="article article-type-post" itemscope
+  <article id="post-294-7" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -38,7 +38,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Actor-critic算法简介
+  294-7.md
 </h1>
   
 
@@ -47,8 +47,8 @@
 
     
     <div class="article-meta">
-      <a href="/2020/01/17/294-6/" class="article-date">
-  <time datetime="2020-01-17T09:03:39.000Z" itemprop="datePublished">2020-01-17</time>
+      <a href="/2020/02/03/294-7/" class="article-date">
+  <time datetime="2020-02-03T03:59:06.000Z" itemprop="datePublished">2020-02-03</time>
 </a>
       
     </div>
@@ -71,25 +71,57 @@
       
 
       
-      <p>关于<code>actor-critic</code>的一个简介。</p>
-<a id="more"></a>
-
-<h2 id="State-amp-state-action-value-functions"><a href="#State-amp-state-action-value-functions" class="headerlink" title="State &amp; state-action value functions"></a>State &amp; state-action value functions</h2><p>首先引入以下变量：<br>$Q^{\pi}(s_t, a_t) = \sum_{t^\prime =t}^TE_{\pi_\theta}[r(s_{t\prime}, a_{t\prime})|s_t,a_t]$ ：在$s_t$中采用动作$a_t$得到的奖励总和。<br>$V^\pi (s_t) = E_{a_t\sim\pi_\theta(a_t|s_t)}[Q^\pi(s_t, a_t)]$：从$s_t$中得到的奖励总和。<br>$A^\pi(s_t,a_t) = Q^\pi(s_t,a_t) - V^\pi(s_t)$：评价$a_t$的优秀的程度。<br>有了以上的定义，我们就可以得到策略的总的奖励。<br>$$J(\theta) \approx \frac{1}{N}\sum_{t=1}^N\sum_{t=1}^T\nabla_{\theta}\log\pi_{\theta}(a_{i,t}|s_{i,t})A^\pi(s_{i,t}|a_i,t)$$<br>其中$A^\pi$越好，则方差越小。</p>
-<h2 id="value-function-fitting"><a href="#value-function-fitting" class="headerlink" title="value function fitting"></a>value function fitting</h2><p>有了上述定义的三个策略(Q, V, A)，就可以进行对应函数的拟合了。那么问题就是，<strong>把什么拟合成什么</strong>？这其实就是<code>actor-critic</code>算法。<br>$$Q^{\pi}(s_t, a_t) \approx r(s_t,a_t) + V^\pi(s_t,a_t)$$ $$A^\pi(s_t,a_t) \approx r(s_t,a_t) + V^\pi(s_t,a_t) - V^\pi(s_t)$$<br>从以上等式可以看到，actor-critic算法基本上是先拟合值函数(value function)，随后再对Q或A进行拟合。<br>本小节只讨论<em>value function</em>的拟合。<br>我们使用神经网络进行拟合。输入状态$s$，得到$V^\pi$的估计值。<br>现在，我们改写$J(\theta)$，得到$$J(\theta) = E_{s_1\sim p(s_1)}[V^\pi(s_1)]$$</p>
-<p>有了上述的理论后，就该开始思考，<strong>如何执行策略估计呢</strong>？<br>答案是使用<code>Monte Carlo policy evaluation</code>，这其实也是策略梯度在做的事情。这种方法指的是该状态的值函数大约等于你从该状态开始执行该策略能得到的总共的奖励。<br>$$V^\pi(s_t) \approx \sum_{t\prime = t}^Tr(s_{t\prime}, a_{t\prime})$$<br>如果多次采样，能够使得估计的效果更好。<br>$$V^\pi(s_t) \approx \frac{1}{N}\sum_{i=1}^N\sum_{t\prime=t}^Tr(s_{t\prime}, a_{t\prime})$$<br>但这种多次采样只是理论上的方法，事实上很难实现。</p>
-<h2 id="Monte-Carlo-evaluation-with-function-approximation"><a href="#Monte-Carlo-evaluation-with-function-approximation" class="headerlink" title="Monte Carlo evaluation with function approximation"></a>Monte Carlo evaluation with function approximation</h2><p>虽然多次采样并不能实现，但是如果使用的是函数逼近去拟合值函数$V^\pi$，就算无法回到之前的状态，我们仍然可以获得更低的方差。相比于多次采样的估计，虽然效果比不上，但是结果仍然很不错。</p>
-<p>有了前面的这些铺垫，我们就可以回答“把什么拟合成什么”的问题。我们使用NN去拟合状态$S$，输出的是$V^\pi$的估计值。<br>我们会生成一堆轨迹，对于每一个轨迹的每一个时间步，我们把当前的状态当成输入放进训练集，同时也放入剩余的总奖励当作输出。这样就有了一堆状态和奖励组成的训练集。<br>下面给出一个新的缩写:<br>$$y_{i,t} = \sum_{t\prime=t}^Tr(s_{i,t\prime},a_{i,t\prime})$$<br>表示来自第$i$条轨迹的时间步$t$下的状态$s_{i,t}$，能在该条轨迹下获得的总的剩余奖励。</p>
+      <h1 id="价值函数介绍"><a href="#价值函数介绍" class="headerlink" title="价值函数介绍"></a>价值函数介绍</h1><p>本次内容：</p>
+<ul>
+<li>仅使用critic，不用actor</li>
+<li>从价值函数中提取策略</li>
+<li>Q-learning算法</li>
+<li>拓展：连续动作，提升</li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>理解价值函数对于策略的提升</li>
+<li>理解Q-learning算法</li>
+<li>理解Q-learning实际应用需要考虑的因素</li>
+</ul>
+<h2 id="能否完全忽略梯度下降"><a href="#能否完全忽略梯度下降" class="headerlink" title="能否完全忽略梯度下降"></a>能否完全忽略梯度下降</h2><p>能否只从<em>critic</em>中提取policy，而不使用前面的策略呢？答案是<strong>肯定</strong>的。<br>首先回顾下面一些定义：</p>
+<h3 id="优势函数"><a href="#优势函数" class="headerlink" title="优势函数"></a>优势函数</h3><p>$A^\pi(s_t, a_t)$：根据策略$\pi$得出$a_t$比平均动作值好多少。倘若每次都取最大值（即最好的动作），那么每次实际采取的动作<strong>至少</strong>与采取$\pi$中的动作$a_t$一样好，并且这个对于每个单步时间都是正确的。</p>
+<h3 id="策略迭代"><a href="#策略迭代" class="headerlink" title="策略迭代"></a>策略迭代</h3><p><strong>进阶的想法</strong>：策略迭代。<br>策略迭代算法：</p>
+<ol>
+<li>估计$A^\pi(s_t, a_t)$</li>
+<li>将$\pi^{\prime} \rightarrow \pi$</li>
+</ol>
+<p>第二步非常容易，所以主要是解决第一步。注意这里有$$A^pi(s, a) = r(s, a) + \gamma E[V^\pi(s^\prime)] - V^\pi(s)$$因此估计$A^\pi$就变成了估计$V^\pi$</p>
+<p>估计$V^\pi$是个<strong>动态规划问题</strong>，为了简化分析，给定一下假设（不可实际应用）：</p>
+<ul>
+<li>已知转移概率$p(s^{\prime}|s, a)$</li>
+<li>$s$和$a$都是离散的，并且足够小，计算机可以存储。</li>
+</ul>
+<p>使用表格法。</p>
+<h2 id="max是个坏方法"><a href="#max是个坏方法" class="headerlink" title="max是个坏方法"></a>max是个坏方法</h2><p>在值函数迭代算法中，每次都要取最大值。这意味着需要在不同动作时找到表达式的不同值。比如有5哥不同的动作，那么需要各自尝试来估计5哥不同的数字，但除了第一个状态，再也回不到其他的状态，并且尝试两种不同的动作。因为一般情况下状态空间非常大，再次回到同一状态非常困难。因此说<strong>max是一种坏方法</strong>。</p>
+<p>解决方法就是不更新价值函数$V^\pi$，而是直接更新$Q^\pi$</p>
+<h2 id="Fitted-Q-iteration"><a href="#Fitted-Q-iteration" class="headerlink" title="Fitted Q-iteration"></a>Fitted Q-iteration</h2><p>完整算法如下：</p>
+<ol>
+<li>使用policy收集数据</li>
+<li>更新$y_i$</li>
+<li>更新$\phi$</li>
+</ol>
+<h2 id="有表格价值函数学习理论"><a href="#有表格价值函数学习理论" class="headerlink" title="有表格价值函数学习理论"></a>有表格价值函数学习理论</h2><p>涉及到过多的数学推导，这里省略。</p>
+<h2 id="无表格价值函数学习"><a href="#无表格价值函数学习" class="headerlink" title="无表格价值函数学习"></a>无表格价值函数学习</h2><p>价值函数迭代算法（使用贝尔曼算子$\beta$）<br>$$V \leftarrow \beta V$$</p>
+<p>最后补充两个术语：</p>
+<ol>
+<li>$V^\pi$：策略$\pi$的价值函数，是$critic$所做的事情</li>
+<li>$V^<em>$：可选策略$\pi^</em>$的价值函数，这是价值函数迭代的结果。</li>
+</ol>
 
       
       <!-- 打赏 -->
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://jadenneal.github.io/2020/01/17/294-6/" data-id="ck5hxt62k0000qcpba7xbfzkx"
+      <a data-url="https://jadenneal.github.io/2020/02/03/294-7/" data-id="ck747yvq200000wpb6qn915hf"
         class="article-share-link">分享</a>
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li></ul>
-
     </footer>
 
   </div>
@@ -98,19 +130,10 @@
   
   <nav class="article-nav">
     
-      <a href="/2020/02/03/294-7/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            294-7.md
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/01/16/294-5/" class="article-nav-link">
+      <a href="/2020/01/17/294-6/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">策略梯度简介(二)</div>
+        <div class="article-nav-title">Actor-critic算法简介</div>
       </a>
     
   </nav>
