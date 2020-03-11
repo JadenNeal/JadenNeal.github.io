@@ -6,7 +6,7 @@
     
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    价值函数介绍 |  Jaden Neal&#39;s Blog
+    高级Q学习算法 |  Jaden Neal&#39;s Blog
   </title>
   
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -30,7 +30,7 @@
   <div id="app">
     <main class="content">
       <section class="outer">
-  <article id="post-294-7" class="article article-type-post" itemscope
+  <article id="post-294-8" class="article article-type-post" itemscope
   itemprop="blogPost" data-scroll-reveal>
 
   <div class="article-inner">
@@ -38,7 +38,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  价值函数介绍
+  高级Q学习算法
 </h1>
   
 
@@ -47,8 +47,8 @@
 
     
     <div class="article-meta">
-      <a href="/2020/02/03/294-7/" class="article-date">
-  <time datetime="2020-02-03T03:59:06.000Z" itemprop="datePublished">2020-02-03</time>
+      <a href="/2020/03/11/294-8/" class="article-date">
+  <time datetime="2020-03-11T08:05:47.121Z" itemprop="datePublished">2020-03-11</time>
 </a>
       
     </div>
@@ -71,49 +71,54 @@
       
 
       
-      <h1 id="价值函数介绍"><a href="#价值函数介绍" class="headerlink" title="价值函数介绍"></a>价值函数介绍</h1><p>本次内容：</p>
-<ul>
-<li>仅使用critic，不用actor</li>
-<li>从价值函数中提取策略</li>
-<li>Q-learning算法</li>
-<li>拓展：连续动作，提升</li>
-</ul>
+      <h1 id="高级Q学习算法"><a href="#高级Q学习算法" class="headerlink" title="高级Q学习算法"></a>高级Q学习算法</h1><h2 id="replay-buffer"><a href="#replay-buffer" class="headerlink" title="replay buffer"></a>replay buffer</h2><p>Replay Buffer是最基本的样本收集再采样的过程，是之前在做DDQN实验中使用的一种样本利用方式，原因是使用Q-learning算法进行在线方式学习时，会存在两个问题:</p>
 <a id="more"></a>
 
-<p>目标：</p>
-<ul>
-<li>理解价值函数对于策略的提升</li>
-<li>理解Q-learning算法</li>
-<li>理解Q-learning实际应用需要考虑的因素</li>
-</ul>
-<h2 id="能否完全忽略梯度下降"><a href="#能否完全忽略梯度下降" class="headerlink" title="能否完全忽略梯度下降"></a>能否完全忽略梯度下降</h2><p>能否只从<em>critic</em>中提取policy，而不使用前面的策略呢？答案是<strong>肯定</strong>的。<br>首先回顾下面一些定义：</p>
-<h3 id="优势函数"><a href="#优势函数" class="headerlink" title="优势函数"></a>优势函数</h3><p>$A^\pi(s_t, a_t)$：根据策略$\pi$得出$a_t$比平均动作值好多少。倘若每次都取最大值（即最好的动作），那么每次实际采取的动作<strong>至少</strong>与采取$\pi$中的动作$a_t$一样好，并且这个对于每个单步时间都是正确的。</p>
-<h3 id="策略迭代"><a href="#策略迭代" class="headerlink" title="策略迭代"></a>策略迭代</h3><p><strong>进阶的想法</strong>：策略迭代。<br>策略迭代算法：</p>
 <ol>
-<li>估计$A^\pi(s_t, a_t)$</li>
-<li>将$\pi^{\prime} \rightarrow \pi$</li>
+<li>交互得到的序列存在一定相关性（因为在线学习往往就是得到一个就立马拿来训练 ）。而机器学习模型对训练样本的假设是独立、同分布的，所以序列打破了这种独立同分布特性，因此效果不太好。</li>
+<li>交互样本使用的效率过低。因为每次要使用一定的时间获取一个batch的样本才能完成一次训练，所以对样本的获取是有些慢的，而且在线学习方式往往会将学习后的样本直接丢弃，这样下来利用的效率不高。</li>
 </ol>
-<p>第二步非常容易，所以主要是解决第一步。注意这里有$$A^pi(s, a) = r(s, a) + \gamma E[V^\pi(s^\prime)] - V^\pi(s)$$因此估计$A^\pi$就变成了估计$V^\pi$</p>
-<p>估计$V^\pi$是个<strong>动态规划问题</strong>，为了简化分析，给定一下假设（不可实际应用）：</p>
-<ul>
-<li>已知转移概率$p(s^{\prime}|s, a)$</li>
-<li>$s$和$a$都是离散的，并且足够小，计算机可以存储。</li>
-</ul>
-<p>使用表格法。</p>
-<h2 id="max是个坏方法"><a href="#max是个坏方法" class="headerlink" title="max是个坏方法"></a>max是个坏方法</h2><p>在值函数迭代算法中，每次都要取最大值。这意味着需要在不同动作时找到表达式的不同值。比如有5哥不同的动作，那么需要各自尝试来估计5哥不同的数字，但除了第一个状态，再也回不到其他的状态，并且尝试两种不同的动作。因为一般情况下状态空间非常大，再次回到同一状态非常困难。因此说<strong>max是一种坏方法</strong>。</p>
-<p>解决方法就是不更新价值函数$V^\pi$，而是直接更新$Q^\pi$</p>
-<h2 id="Fitted-Q-iteration"><a href="#Fitted-Q-iteration" class="headerlink" title="Fitted Q-iteration"></a>Fitted Q-iteration</h2><p>完整算法如下：</p>
+<p>采用了<strong>Replay Buffer</strong>的Q-learning算法如下：</p>
 <ol>
-<li>使用policy收集数据</li>
-<li>更新$y_i$</li>
-<li>更新$\phi$</li>
+<li>使用策略收集数据，放入缓存$B$中</li>
+<li>从缓存$B$中取出一个批次</li>
+<li>计算梯度。</li>
+<li>不断重复上述两步即可。</li>
 </ol>
-<h2 id="有表格价值函数学习理论"><a href="#有表格价值函数学习理论" class="headerlink" title="有表格价值函数学习理论"></a>有表格价值函数学习理论</h2><p>涉及到过多的数学推导，这里省略。</p>
-<h2 id="无表格价值函数学习"><a href="#无表格价值函数学习" class="headerlink" title="无表格价值函数学习"></a>无表格价值函数学习</h2><p>价值函数迭代算法（使用贝尔曼算子$\beta$）<br>$$V \leftarrow \beta V$$</p>
-<p>最后补充两个术语：</p>
+<h2 id="Q-learning与回归的关系"><a href="#Q-learning与回归的关系" class="headerlink" title="Q-learning与回归的关系"></a>Q-learning与回归的关系</h2><p>从上面的使用replay buffer的Q-learning而言，2、3两步更像是在做回归运算，虽然本质不是回归。第三步做了两件事，一个是梯度下降，二是移动目标（<em>target</em>），因此也称为<strong>target networks</strong>。</p>
+<h2 id="Q-learning-with-target-networks"><a href="#Q-learning-with-target-networks" class="headerlink" title="Q-learning with target networks"></a>Q-learning with target networks</h2><p>Q-learning with replay buffer and target networks:</p>
 <ol>
-<li>$V^\pi$：策略$\pi$的价值函数，是$critic$所做的事情</li>
-<li>$V^<em>$：可选策略$\pi^</em>$的价值函数，这是价值函数迭代的结果。</li>
+<li>保存target networks的参数：$\phi^\prime \leftarrow \phi$</li>
+<li>使用策略收集数据，放入缓存$B$中</li>
+<li>从缓存$B$中取出一个批次</li>
+<li>计算梯度</li>
+</ol>
+<p>在第四步，目标在内部循环中并不改变；第2、3、4步可以看成是<strong>监督学习</strong></p>
+<h2 id="DQN"><a href="#DQN" class="headerlink" title="DQN"></a>DQN</h2><p>由replay buffer和target network组成经典的深度Q-learning网络。<br>算法如下：</p>
+<ol>
+<li>采取动作$a_i$，使之满足$(s_i, a_i, s_i^\prime, r_i)$，然后将其加入到缓存$\beta$中。</li>
+<li>从缓存$\beta$中均匀采样，得到小批次（mini-batch）$(s_j, a_j, s_j^\prime, r_j)$</li>
+<li>使用target network计算$y_j = r_j + \gamma\max_{a_j^\prime}Q_{\phi^\prime}(s_j^\prime, a_j^\prime)$</li>
+<li>更新策略$\phi$</li>
+<li>更新$\phi^\prime$：每$N$步复制一次$\phi$</li>
+</ol>
+<h2 id="Fitted-Q-iteration-and-Q-learning"><a href="#Fitted-Q-iteration-and-Q-learning" class="headerlink" title="Fitted Q-iteration and Q-learning"></a>Fitted Q-iteration and Q-learning</h2><p>首先定义三个过程：</p>
+<ol>
+<li>过程一：收集数据（中途可能丢弃旧的数据）</li>
+<li>过程二：更新目标</li>
+<li>过程三：Q函数回归</li>
+</ol>
+<p>下面进行比较：</p>
+<ol>
+<li>在线Q-学习：立即抛弃旧数据，三个过程以同一速度运行</li>
+<li>DQN：1、3两个过程同速运行，过程2运行较慢</li>
+<li>Q-iteration：这是一系列循环，3在2中循环，而2又在1中循环</li>
+</ol>
+<h2 id="如何优化目标"><a href="#如何优化目标" class="headerlink" title="如何优化目标"></a>如何优化目标</h2><p>附加一个近似项。后面就是一堆公式推导了。优化$\theta$。</p>
+<h2 id="实用方法"><a href="#实用方法" class="headerlink" title="实用方法"></a>实用方法</h2><ol>
+<li>自然梯度下降</li>
+<li>TRPO（Trust Region Policy Optimization）</li>
+<li>直接使用重要性（Important Sampling, IS）采样</li>
 </ol>
 
       
@@ -121,7 +126,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://jadenneal.github.io/2020/02/03/294-7/" data-id="ck747yvq200000wpb6qn915hf"
+      <a data-url="https://jadenneal.github.io/2020/03/11/294-8/" data-id="ck7n1huip0000t0pb3uwy40oj"
         class="article-share-link">分享</a>
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li></ul>
@@ -134,19 +139,10 @@
   
   <nav class="article-nav">
     
-      <a href="/2020/03/11/294-8/" class="article-nav-link">
-        <strong class="article-nav-caption">上一篇</strong>
-        <div class="article-nav-title">
-          
-            高级Q学习算法
-          
-        </div>
-      </a>
     
-    
-      <a href="/2020/01/17/294-6/" class="article-nav-link">
+      <a href="/2020/02/03/294-7/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">Actor-critic算法简介</div>
+        <div class="article-nav-title">价值函数介绍</div>
       </a>
     
   </nav>
