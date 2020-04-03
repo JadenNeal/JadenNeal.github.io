@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    水下光通信研究 |  Jaden Neal&#39;s Blog
+  </title>
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<script src="/js/pace.min.js"></script>
+
+
+  
+
+  
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+</html>
+
+<body>
+  <div id="app">
+    <main class="content">
+      <section class="outer">
+  <article id="post-A-survey-of-underwater-wireless-optical-communication" class="article article-type-post" itemscope
+  itemprop="blogPost" data-scroll-reveal>
+
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  水下光通信研究
+</h1>
+  
+
+    </header>
+    
+
+    
+    <div class="article-meta">
+      <a href="/2020/03/26/A-survey-of-underwater-wireless-optical-communication/" class="article-date">
+  <time datetime="2020-03-26T15:17:46.000Z" itemprop="datePublished">2020-03-26</time>
+</a>
+      
+    </div>
+    
+
+    
+    
+    <div class="tocbot"></div>
+
+
+
+
+
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+
+
+      
+
+      
+      <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p><strong>UWOC定义</strong>：水下无线通信是指通过无线载体在非制导水环境中传输数据。<br>而<strong>水下光通信</strong>（UWOC）则指的是以光波为传输载体的水下无线通信。</p>
+<p><strong>对比</strong>：主要是和RF和声波对比：更高的传输带宽，更快的数据速率。</p>
+<p><strong>缺陷</strong>：由水下信道引入的严重的吸收和散射。<br><strong>本文工作</strong>：对90年代到现在的最先进的研究做了个调查，主要在三方面：</p>
+<ol>
+<li>信道特性</li>
+<li>调制及编码技术</li>
+<li>UWOC的实施。</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><h3 id="UWOC概述"><a href="#UWOC概述" class="headerlink" title="UWOC概述"></a>UWOC概述</h3><p>Duntley在1963年提出海水有着与蓝色和绿色光谱（波长为450-550纳米）类似的低损耗特性。正是这一发现奠定了<code>UWOC</code>的研究。<br>根据<code>UWSNs</code>（水下无线传感网络）中节点间的链路配置，<code>UWOC</code>可分为四类：</p>
+<ol>
+<li>点到点<code>LOS</code>（line-of-sight，视距）配置。这是<code>UWOC</code>中最常用的链路配置。<ul>
+<li>特点：接收器检测发射器方向的光束。</li>
+<li>缺点：限制了<code>UWOC</code>系统在混浊或湍流水环境中的性能，在不稳定节点（比如<code>AUV</code>和<code>ROV</code>）中会成为一个非常严重的问题。</li>
+<li>缺陷原因：发散角较窄，需要精确的发射点。</li>
+</ul>
+</li>
+<li>扩散<code>LOS</code>配置。<ul>
+<li>特点：用分散光源来完成一到多节点的<code>UWOC</code>通信。</li>
+<li>优点：广播方法放宽了精确指向的要求。</li>
+<li>缺点：受<strong>水生生物衰减</strong>（aquatic attenuation）的影响很大；因此，短距离通信和较低的数据速率都是该配置的缺点。</li>
+</ul>
+</li>
+<li>基于回复反射器的视距配置，可认为是点到点LOS配置的特殊实现。<ul>
+<li>特点：适合功率和重量受限的双<code>UWOC</code>系统</li>
+<li>优点：降低功率，音量以及重量。</li>
+<li>缺点：发射端的光信号的后向散射可能会干扰到反射信号。</li>
+</ul>
+</li>
+<li>无视距配置。<ul>
+<li>特点：发送端以更大的发射角通过海面发送信号，光束会经历完全的内部反射；接收端需保证对着海面的方向。</li>
+<li>优点：克服了<code>LOS UWOC</code>的排列限制。</li>
+<li>缺点：由风或者其他干扰引起的随机海面坡度。</li>
+</ul>
+</li>
+</ol>
+<h3 id="UWOC优点和挑战"><a href="#UWOC优点和挑战" class="headerlink" title="UWOC优点和挑战"></a>UWOC优点和挑战</h3><p>见下表。</p>
+<center><img src="https://s1.ax1x.com/2020/03/28/GEEEbF.jpg" alt="UWOC优缺点比较" border="0" /></center>
+
+<h2 id="UWOC信道建模"><a href="#UWOC信道建模" class="headerlink" title="UWOC信道建模"></a>UWOC信道建模</h2><h3 id="水下光传播原理"><a href="#水下光传播原理" class="headerlink" title="水下光传播原理"></a>水下光传播原理</h3><p>水的光学特性可分为两类：</p>
+<ol>
+<li>隐式光学属性（<code>IOPs</code>）：<ul>
+<li>一种仅取决于传输介质本身的光学参数，独立于光源，</li>
+<li>主要包括<strong>吸收系数、散射系数、衰减系数和体积散射函数VSF</strong>。</li>
+<li>通常用于确定通信链路预算</li>
+</ul>
+</li>
+<li>显式光学属性（<code>AOPs</code>）：<ul>
+<li>不仅取决于传输介质，还取决于光学场的几何结构，比如垂直和散射。</li>
+<li>主要包括<strong>辐射率，辐照度和反射率</strong>。</li>
+<li>通常用于计算海洋表面附近的通信系统的环境光水平。</li>
+</ul>
+</li>
+</ol>
+<p>由于IOP对链路表现影响较大，故只讨论IOP。<br>IOP主要部分是吸收系数和散射系数。</p>
+<ul>
+<li>吸收是一个能量转移过程，光子失去能量，转化成其他形似。</li>
+<li>散射则源于中子和原子的交互；</li>
+</ul>
+<p>UWOC的的吸收和散射主要有三个影响：</p>
+<ol>
+<li>吸收会导致光的传播能量连续下降；</li>
+<li>散射会导致光束扩散，导致接收器收集的光子数量减少，从而导致<code>SNR</code>下降；</li>
+<li>光的散射会使光子的到达时间不同，导致<strong>多径色散</strong>。</li>
+</ol>
+<p>下图给出一个吸收和散射特性在不同环境下的总结。</p>
+<center><img src="https://s1.ax1x.com/2020/03/29/GZ5Gid.jpg" alt="不同环境下吸收和散射特性" border="0" /></center>
+
+<h3 id="UWOC中水生光学衰减建模"><a href="#UWOC中水生光学衰减建模" class="headerlink" title="UWOC中水生光学衰减建模"></a>UWOC中水生光学衰减建模</h3><p>该模型的目的是<strong>精确描述吸收和特殊链路配置的散射效应</strong>，可分为两类：</p>
+<ul>
+<li><code>LOS</code> 配置</li>
+<li><code>NLOS</code> 配置</li>
+</ul>
+<p>下面逐一介绍。</p>
+<h4 id="LOS配置中的水生光学衰减"><a href="#LOS配置中的水生光学衰减" class="headerlink" title="LOS配置中的水生光学衰减"></a>LOS配置中的水生光学衰减</h4><p>一种是为了简化，直接应用<code>朗伯比尔定律</code>来对<code>LOS UWOC</code>建模。<br>另一种更为常用，称为<code>辐射传递方程RTE</code>。<code>VSF</code>有个缺点，只能确定一个单一折射率条件下单个光子的散射特性，故很难在实际应用中衡量。因此，人们将<code>RTE</code>应用到<code>UWOC</code>信道建模研究上。</p>
+<p><code>RTE</code>能够描述稳定介质中光波的能量守恒，它可以通过解析和数值方式求解。<br>但RTE很难找到一个精确的解析解，因此最近几年相关研究也较少。重点是数值解。</p>
+<p><code>RTE</code>的数值解法最流行的是<code>蒙特卡罗模拟</code>。这是一种概率方法，通过发送和跟踪大量光子来模拟水下光传播的损失。<br>除此之外，还有<code>离散坐标法</code>和<code>不变嵌入法</code>，应用较少，不做过多讨论。</p>
+<h4 id="NLOS配置中的水生光学衰减"><a href="#NLOS配置中的水生光学衰减" class="headerlink" title="NLOS配置中的水生光学衰减"></a>NLOS配置中的水生光学衰减</h4><p>NLOS和LOS信道之间的主要区别是<strong>波浪状海面引入的反射效应</strong>。因此该区别也是NLOS信道建模中的一个关键部分。NLOS配置的大多数信道模型都是通过数值方法（例如蒙特卡罗模拟）导出的。</p>
+<h3 id="UWOC几何错位建模"><a href="#UWOC几何错位建模" class="headerlink" title="UWOC几何错位建模"></a>UWOC几何错位建模</h3><p>分散的点到点<code>UWOC</code>链路存在时间错位问题，但该问题是任何<code>UWOC</code>系统都无法避免的。综合来说，有以下三个原因提高了系统分布的要求。</p>
+<ol>
+<li>收发器的限制。</li>
+<li>由水下航行器，洋流和其他湍流源引起的相对运动。</li>
+<li>折射率变化。</li>
+</ol>
+<p>UWOC几何错位建模也可以分成解析解方法和数值解方法。重点讨论数值解。<br><strong>数值解表明</strong>：</p>
+<ol>
+<li>不管水的类型如何，适当的错位量在足够大的传输功率下不会造成性能严重下降；</li>
+<li><code>BER（误码率）</code>随着指向误差的增加而恶化；</li>
+<li>更多的浑水，较长的链路范围和较大的跨距可能会降低信道容量，并且更多的浑水和较长的航链路范围会削弱随机海面坡度对信道容量的影响。</li>
+<li>数值结果表明，较大的发散角和仰角可以减弱接收到的光强度，而更多的混浊水和更长的链接范围会降低每个光子对其初始发射角的灵敏度。</li>
+</ol>
+<h3 id="UWOC链接湍流建模"><a href="#UWOC链接湍流建模" class="headerlink" title="UWOC链接湍流建模"></a>UWOC链接湍流建模</h3><p><strong>UWOC中的湍流定义为使水经历折射率快速变化的一个事件</strong>。湍流在水下光通信中常常被忽视，但实际上它对<code>UWOC</code>系统造成的负面影响也是很可观的。<br><strong>数值解方法表明</strong>：</p>
+<ol>
+<li>SIMO（单输入多输出）方案可以有效减少信道衰落，扩展通信范围；</li>
+<li>洋流速度是引起湍流并影响UWOC系统辐照度时间统计的主要因素。</li>
+</ol>
+<h2 id="UWOC的调制和编码技术"><a href="#UWOC的调制和编码技术" class="headerlink" title="UWOC的调制和编码技术"></a>UWOC的调制和编码技术</h2><p><strong>UWOC调制技术总结</strong>：</p>
+<center><img src="https://s1.ax1x.com/2020/03/31/GlZMgf.jpg" alt="UWOC调制技术"></center>
+
+<p><strong>UWOC编码技术总结</strong>：</p>
+<center><img src="https://s1.ax1x.com/2020/03/31/GlZuCt.jpg" alt="UWOC编码技术"></center>
+
+<h2 id="UWOC的实验装置和原型"><a href="#UWOC的实验装置和原型" class="headerlink" title="UWOC的实验装置和原型"></a>UWOC的实验装置和原型</h2><h3 id="典型LOS-NLOS-UWOC系统"><a href="#典型LOS-NLOS-UWOC系统" class="headerlink" title="典型LOS/NLOS UWOC系统"></a>典型LOS/NLOS UWOC系统</h3><p>尽管商用的<code>UWOC</code>产品在2000年就提出来了，但是<code>UWOC</code>大规模的商业应用至今也没实现。<br>一种典型的<code>UWOC LOS</code>系统：</p>
+<center><img src="https://s1.ax1x.com/2020/04/01/G8W1kq.jpg" alt="UWOC LOS系统"></center>
+
+<p>下面简单介绍该系统工作流程。</p>
+<ul>
+<li><strong>在发射端</strong>，PC产生信息比特，然后由光学载波器进行调制，接着由光学放大器放大后通过透镜继续传输，水箱（管）用来给水下传输链路建模。为了模拟水下环境的不同折射条件和浑浊度，还向水中加入了<strong>抗酸剂</strong>。</li>
+<li><strong>在接收端</strong>，光学信号通过一个光学滤波器和聚焦透镜，由光子探测器进行接收，随后用<strong>跨导放大器</strong>将电流转换成电压，接着通过<code>LPF</code>，最后是解调和解编码。</li>
+</ul>
+<p>典型UWOC实验系统使用两种光源：</p>
+<ul>
+<li>发光二极管（LED）</li>
+<li>激光二极管（LD）</li>
+</ul>
+<p>使用的光线则是蓝色光或者绿色光。<br><code>LD</code>与<code>LED</code>的对比：</p>
+<ol>
+<li>优点：LD输出功率大，准直特性好，光谱扩展窄还有切换速度快</li>
+<li>缺点：LD成本高，生命周期短，对温度更敏感。</li>
+</ol>
+<p>但综合来说，还是<code>LD</code>应用UWOC系统更合适。<br>在接收端也有两种光电二极管</p>
+<ol>
+<li>PIN二极管</li>
+<li>雪崩光电二极管</li>
+</ol>
+<p>二者主要不同之处在于噪声表现上。</p>
+<h3 id="带有后向反射的UWOC"><a href="#带有后向反射的UWOC" class="headerlink" title="带有后向反射的UWOC"></a>带有后向反射的UWOC</h3><p>后向反射器是一种光学装置，可以将任意入射光反射回其光源。一种调制的后向反射<code>UWOC</code>系统就是利用的这种特性。<br>这种系统的最大优点是：<strong>大部分功耗，设备重量，体积和指向要求已转移到链路的有源端，因此无源端的尺寸小，功率和指向要求相对较低</strong>。</p>
+<p>缺点则有两方面：</p>
+<ol>
+<li>必须通过水下信道传输两次，因此衰减和干扰很高。</li>
+<li>反向散射光在浑浊的水中可能会很显着，最终将超过所需的向后反射信号。</li>
+</ol>
+<h3 id="水下交通的UWOC应用"><a href="#水下交通的UWOC应用" class="headerlink" title="水下交通的UWOC应用"></a>水下交通的UWOC应用</h3><p>按通信方式来分，水下交通工具可分为三类：</p>
+<ol>
+<li>栓系水下航行器：通常是通过光纤或电缆连接到地面控制平台的受控机器人</li>
+<li>无线水下航行器：通常是自主操作的机器人，利用声波作为可行的通信载体</li>
+<li>混合水下航行器：上面二者的结合体。灵活性和可靠性都是最好的，但是不适用于大型系统。</li>
+</ol>
+<h3 id="混合声-光UWC系统"><a href="#混合声-光UWC系统" class="headerlink" title="混合声/光UWC系统"></a>混合声/光UWC系统</h3><p>鉴于吸收和散射对<code>UWOC</code>系统的频繁的负面影响，需要对<code>UWOC</code>系统的可靠性进行加强。一种可行的方法就是将声/光波加入<code>UWOC</code>系统中。</p>
+<h2 id="结论及未来研究方向"><a href="#结论及未来研究方向" class="headerlink" title="结论及未来研究方向"></a>结论及未来研究方向</h2><p>见下图。</p>
+<center><img src="https://s1.ax1x.com/2020/04/03/GdVjXQ.jpg" alt="结论"></center>
+
+<p>综上可知，目前关于<code>UWOC</code>的研究大多数都是物理层的研究，对于<code>UWOC</code>网路的研究很少，因此可以作为未来的研究方向。</p>
+
+      
+      <!-- 打赏 -->
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://jadenneal.github.io/2020/03/26/A-survey-of-underwater-wireless-optical-communication/" data-id="ck8kc36360000vkpb3b5799x9"
+        class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B0%B4%E4%B8%8B%E5%85%89%E9%80%9A%E4%BF%A1/" rel="tag">水下光通信</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag">论文阅读</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%80%9A%E4%BF%A1%E5%B7%A5%E7%A8%8B/" rel="tag">通信工程</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+  
+  <nav class="article-nav">
+    
+      <a href="/2020/03/27/ACKTR/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            ACKTR
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2020/03/19/classical-DQN/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">经典DQN</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+  
+<!-- valine评论 -->
+<div id="vcomments-box">
+    <div id="vcomments">
+    </div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        notify: false,
+        verify: false,
+        app_id: '',
+        app_key: '',
+        path: window.location.pathname,
+        avatar: 'mp',
+        placeholder: '想对作者说点什么',
+        recordIP: true
+    });
+    const infoEle = document.querySelector('#vcomments .info');
+    if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+        infoEle.childNodes.forEach(function (item) {
+            item.parentNode.removeChild(item);
+        });
+    }
+</script>
+<style>
+    #vcomments-box {
+        padding: 5px 30px;
+    }
+
+    @media screen and (max-width: 800px) {
+        #vcomments-box {
+            padding: 5px 0px;
+        }
+    }
+
+    #vcomments-box #vcomments {
+        background-color: #fff;
+    }
+
+    .v .vlist .vcard .vh {
+        padding-right: 20px;
+    }
+
+    .v .vlist .vcard {
+        padding-left: 10px;
+    }
+</style>
+
+  
+
+  
+  
+  
+
+</article>
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>
+        &copy;
+        2016-2020
+        Jaden Neal
+      </li>
+      <li>
+        
+      </li>
+    </ul>
+    <ul class="list-inline">
+      <li>
+        
+        
+        <ul class="list-inline">
+  <li>PV:<span id="busuanzi_value_page_pv"></span></li>
+  <li>UV:<span id="busuanzi_value_site_uv"></span></li>
+</ul>
+        
+      </li>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+    <div class="to_top">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+      </div>
+    </main>
+    
+    <aside class="sidebar">
+      
+        <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Jaden Neal&#39;s Blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">目录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0">深度学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E7%88%AC%E8%99%AB">爬虫</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E9%80%9A%E4%BF%A1%E7%A7%91%E6%99%AE">通信科普</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/latex">latex</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/%E5%85%B6%E4%BB%96">其他</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+      </aside>
+      <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+      
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+<script>
+  var ayerConfig = {
+    mathjax: true
+  }
+</script>
+
+
+<script src="/js/ayer.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+
+
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<script type="text/javascript" src="https://js.users.51.la/20544303.js"></script>
+  
+  
+  </div>
+</body>
+
+</html>
